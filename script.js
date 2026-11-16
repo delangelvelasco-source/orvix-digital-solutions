@@ -23,19 +23,15 @@ function initHeroSphere() {
   const canvas = document.getElementById('hero-canvas');
   if (!canvas || typeof THREE === 'undefined') return;
 
-  const isMobile = window.innerWidth < 768;
-  const size = isMobile ? 300 : 380;
-
+  const size = 300;
   canvas.style.width = size + 'px';
   canvas.style.height = size + 'px';
   canvas.style.display = 'block';
   canvas.style.margin = '0 auto';
 
   const scene = new THREE.Scene();
-  scene.fog = new THREE.FogExp2(0x150408, 0.06);
-
-  const camera = new THREE.PerspectiveCamera(38, 1, 0.1, 50);
-  camera.position.z = 4.2;
+  const camera = new THREE.PerspectiveCamera(35, 1, 0.1, 50);
+  camera.position.z = 4.0;
 
   const renderer = new THREE.WebGLRenderer({
     canvas: canvas,
@@ -43,109 +39,76 @@ function initHeroSphere() {
     antialias: true
   });
   renderer.setSize(size, size);
-  renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.5));
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
   renderer.setClearColor(0x000000, 0);
 
-  // Sphere
-  const geo = new THREE.IcosahedronGeometry(1.28, 2);
+  // Clean metallic sphere
+  const geo = new THREE.SphereGeometry(1.2, 48, 48);
   const mat = new THREE.MeshStandardMaterial({
-    color: 0x222228,
-    metalness: 0.85,
-    roughness: 0.2,
-    emissive: 0x3a0000,
-    emissiveIntensity: 0.3
+    color: 0x3a3a42,
+    metalness: 0.95,
+    roughness: 0.12,
+    emissive: 0x220000,
+    emissiveIntensity: 0.2
   });
   const sphere = new THREE.Mesh(geo, mat);
   scene.add(sphere);
 
-  // Wireframe
+  // Thin wireframe
   const wire = new THREE.Mesh(
-    new THREE.IcosahedronGeometry(1.32, 1),
+    new THREE.SphereGeometry(1.22, 24, 24),
     new THREE.MeshBasicMaterial({
       color: 0xE32636,
       wireframe: true,
       transparent: true,
-      opacity: 0.25
+      opacity: 0.2
     })
   );
   scene.add(wire);
 
-  // Core
+  // Bright core
   const core = new THREE.Mesh(
-    new THREE.SphereGeometry(0.45, 20, 20),
+    new THREE.SphereGeometry(0.4, 32, 32),
     new THREE.MeshBasicMaterial({
-      color: 0xE32636,
+      color: 0xff2244,
       transparent: true,
-      opacity: 0.35
+      opacity: 0.6
     })
   );
   scene.add(core);
 
-  // Mie scattering approximation: multiple glow layers
-  // Forward scatter (stronger in light direction)
-  const mieGeo = new THREE.SphereGeometry(1.6, 32, 32);
-  const mieMat = new THREE.ShaderMaterial({
-    transparent: true,
-    depthWrite: false,
-    blending: THREE.AdditiveBlending,
-    uniforms: {
-      uTime: { value: 0 },
-      uColor: { value: new THREE.Color(0xE32636) }
-    },
-    vertexShader: `
-      varying vec3 vNormal;
-      varying vec3 vViewDir;
-      void main() {
-        vNormal = normalize(normalMatrix * normal);
-        vec4 mvPos = modelViewMatrix * vec4(position, 1.0);
-        vViewDir = normalize(-mvPos.xyz);
-        gl_Position = projectionMatrix * mvPos;
-      }
-    `,
-    fragmentShader: `
-      uniform float uTime;
-      uniform vec3 uColor;
-      varying vec3 vNormal;
-      varying vec3 vViewDir;
-      void main() {
-        // Mie-like forward scattering approximation
-        float fresnel = pow(1.0 - abs(dot(vNormal, vViewDir)), 2.5);
-        float pulse = 0.6 + 0.4 * sin(uTime * 1.2);
-        float alpha = fresnel * 0.35 * pulse;
-        gl_FragColor = vec4(uColor, alpha);
-      }
-    `
-  });
-  const mieGlow = new THREE.Mesh(mieGeo, mieMat);
-  scene.add(mieGlow);
-
-  // Outer soft glow
-  const outerGlow = new THREE.Mesh(
-    new THREE.SphereGeometry(2.0, 24, 24),
+  // Soft outer glow
+  const glow = new THREE.Mesh(
+    new THREE.SphereGeometry(1.5, 32, 32),
     new THREE.MeshBasicMaterial({
       color: 0xE32636,
       transparent: true,
-      opacity: 0.04,
+      opacity: 0.08,
       side: THREE.BackSide
     })
   );
-  scene.add(outerGlow);
+  scene.add(glow);
 
-  // Lights
-  scene.add(new THREE.AmbientLight(0xffffff, 0.4));
-  const keyLight = new THREE.DirectionalLight(0xffffff, 0.65);
-  keyLight.position.set(-2.5, 3.5, 4);
-  scene.add(keyLight);
+  // Strong lighting
+  scene.add(new THREE.AmbientLight(0xffffff, 0.6));
+  
+  const mainLight = new THREE.DirectionalLight(0xffffff, 1.2);
+  mainLight.position.set(-4, 5, 6);
+  scene.add(mainLight);
 
-  const redLight = new THREE.PointLight(0xE32636, 4.5, 16);
-  redLight.position.set(2.2, 1.2, 2.8);
+  const fillLight = new THREE.DirectionalLight(0x8888aa, 0.4);
+  fillLight.position.set(3, -2, 2);
+  scene.add(fillLight);
+
+  const redLight = new THREE.PointLight(0xE32636, 6, 12);
+  redLight.position.set(2, 1, 3);
   scene.add(redLight);
 
-  // Particles
-  const count = isMobile ? 40 : 65;
+  // Subtle particles
+  const count = 35;
   const positions = new Float32Array(count * 3);
   for (let i = 0; i < count; i++) {
-    const r = 1.8 + Math.random() * 0.5;
+    const r = 1.7 + Math.random() * 0.4;
     const th = Math.random() * Math.PI * 2;
     const ph = Math.acos(2 * Math.random() - 1);
     positions[i * 3] = r * Math.sin(ph) * Math.cos(th);
@@ -157,11 +120,11 @@ function initHeroSphere() {
   const particles = new THREE.Points(
     pGeo,
     new THREE.PointsMaterial({
-      color: 0xE32636,
-      size: 0.038,
+      color: 0xff4466,
+      size: 0.025,
       sizeAttenuation: true,
       transparent: true,
-      opacity: 0.5,
+      opacity: 0.7,
       blending: THREE.AdditiveBlending,
       depthWrite: false
     })
@@ -171,22 +134,19 @@ function initHeroSphere() {
   let t = 0;
   function animate() {
     requestAnimationFrame(animate);
-    t += 0.008;
-    sphere.rotation.y += 0.0045;
-    sphere.rotation.x = Math.sin(t * 0.3) * 0.08;
+    t += 0.006;
+    sphere.rotation.y += 0.003;
+    sphere.rotation.x = Math.sin(t * 0.2) * 0.05;
     wire.rotation.copy(sphere.rotation);
-    core.rotation.y = sphere.rotation.y * 1.25;
-    core.scale.setScalar(1 + Math.sin(t * 1.6) * 0.05);
-    mieGlow.material.uniforms.uTime.value = t;
-    mieGlow.scale.setScalar(1 + Math.sin(t * 0.7) * 0.03);
-    outerGlow.scale.setScalar(1 + Math.sin(t * 0.5) * 0.05);
-    redLight.position.x = Math.sin(t * 0.5) * 2.4;
-    redLight.position.z = Math.cos(t * 0.5) * 2.4;
-    particles.rotation.y = t * 0.055;
+    core.scale.setScalar(1 + Math.sin(t * 2) * 0.08);
+    glow.scale.setScalar(1 + Math.sin(t * 0.8) * 0.03);
+    redLight.position.x = Math.sin(t * 0.4) * 2;
+    redLight.position.z = Math.cos(t * 0.4) * 2;
+    particles.rotation.y = t * 0.04;
     renderer.render(scene, camera);
   }
   animate();
-  console.log('ORVIX: Mie scattering approximation activa');
+  console.log('ORVIX: Esfera premium');
 }
 
 function handleSubmit(e) {
