@@ -13,80 +13,81 @@ function initHeroSphere() {
   const canvas = document.getElementById('hero-canvas');
   if (!canvas || typeof THREE === 'undefined') return;
 
-  const isMobile = window.innerWidth < 768;
-  const size = isMobile ? 280 : 360;
-
+  const size = 300;
   canvas.style.width = size + 'px';
   canvas.style.height = size + 'px';
   canvas.style.display = 'block';
   canvas.style.margin = '0 auto';
 
   const scene = new THREE.Scene();
-  const camera = new THREE.PerspectiveCamera(34, 1, 0.1, 50);
-  camera.position.z = 3.9;
+  const camera = new THREE.PerspectiveCamera(30, 1, 0.1, 50);
+  camera.position.z = 3.6;
 
-  const renderer = new THREE.WebGLRenderer({
-    canvas,
-    alpha: true,
-    antialias: !isMobile,
-    powerPreference: 'low-power'
-  });
+  const renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true });
   renderer.setSize(size, size);
-  renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, isMobile ? 1 : 1.5));
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.5));
   renderer.setClearColor(0x000000, 0);
 
-  // Adaptive sphere
-  const segments = isMobile ? 32 : 48;
-  const geo = new THREE.SphereGeometry(1.1, segments, segments);
+  // Solid metallic sphere
+  const geo = new THREE.SphereGeometry(1.05, 48, 48);
   const mat = new THREE.MeshStandardMaterial({
-    color: 0x4a4a55,
-    metalness: 0.8,
-    roughness: 0.25,
-    emissive: 0x2a1010,
-    emissiveIntensity: 0.12
+    color: 0x2c2c32,
+    metalness: 0.92,
+    roughness: 0.18,
+    emissive: 0x1a0505,
+    emissiveIntensity: 0.1
   });
   const sphere = new THREE.Mesh(geo, mat);
   scene.add(sphere);
 
-  // Light wireframe on desktop only
-  let wire = null;
-  if (!isMobile) {
-    wire = new THREE.Mesh(
-      new THREE.SphereGeometry(1.12, 24, 24),
-      new THREE.MeshBasicMaterial({ color: 0xE32636, wireframe: true, transparent: true, opacity: 0.25 })
-    );
-    scene.add(wire);
-  }
+  // Subtle wireframe overlay
+  const wire = new THREE.Mesh(
+    new THREE.SphereGeometry(1.06, 20, 20),
+    new THREE.MeshBasicMaterial({
+      color: 0xE32636,
+      wireframe: true,
+      transparent: true,
+      opacity: 0.18
+    })
+  );
+  scene.add(wire);
 
-  // Core
+  // Inner energy core
   const core = new THREE.Mesh(
-    new THREE.SphereGeometry(0.32, isMobile ? 16 : 24, isMobile ? 16 : 24),
-    new THREE.MeshBasicMaterial({ color: 0xff2244, transparent: true, opacity: 0.65 })
+    new THREE.SphereGeometry(0.28, 24, 24),
+    new THREE.MeshBasicMaterial({
+      color: 0xff1a3a,
+      transparent: true,
+      opacity: 0.7
+    })
   );
   scene.add(core);
 
   // Lights
-  scene.add(new THREE.AmbientLight(0xffffff, isMobile ? 0.55 : 0.65));
-  const key = new THREE.DirectionalLight(0xffffff, isMobile ? 1.0 : 1.3);
-  key.position.set(-4, 5, 6);
+  scene.add(new THREE.AmbientLight(0xffffff, 0.45));
+  const key = new THREE.DirectionalLight(0xffffff, 1.1);
+  key.position.set(-3, 4, 5);
   scene.add(key);
-  const red = new THREE.PointLight(0xE32636, isMobile ? 5 : 7, 12);
-  red.position.set(2, 1, 3);
+  const red = new THREE.PointLight(0xE32636, 5, 10);
+  red.position.set(1.8, 0.8, 2.5);
   scene.add(red);
+  const fill = new THREE.PointLight(0x4466ff, 1.5, 8);
+  fill.position.set(-1.5, -0.5, 2);
+  scene.add(fill);
 
   let t = 0;
   function animate() {
     requestAnimationFrame(animate);
-    t += 0.005;
-    sphere.rotation.y += 0.0035;
-    if (wire) wire.rotation.copy(sphere.rotation);
-    core.scale.setScalar(1 + Math.sin(t * 2) * 0.08);
-    red.position.x = Math.sin(t * 0.45) * 2.2;
-    red.position.z = Math.cos(t * 0.45) * 2.2;
+    t += 0.004;
+    sphere.rotation.y += 0.003;
+    sphere.rotation.x = Math.sin(t * 0.15) * 0.04;
+    wire.rotation.copy(sphere.rotation);
+    core.scale.setScalar(1 + Math.sin(t * 2.2) * 0.12);
+    red.position.x = Math.sin(t * 0.4) * 1.8;
+    red.position.z = Math.cos(t * 0.4) * 1.8;
     renderer.render(scene, camera);
   }
   animate();
-  console.log('ORVIX: 3D móvil optimizado');
 }
 
 function handleSubmit(e) {
