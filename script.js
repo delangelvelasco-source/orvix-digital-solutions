@@ -20,7 +20,7 @@ window.addEventListener('scroll', () => {
   }
 });
 
-// Three.js Dual Renderer: WebGPU + TSL Nodes + Compute Particles
+// Three.js Dual Renderer: WebGPU + Animated TSL Energy Sphere
 async function initHeroSphere() {
   const canvas = document.getElementById('hero-canvas');
   if (!canvas) return;
@@ -68,20 +68,26 @@ async function initHeroSphere() {
   }
   setSize();
 
-  // Core sphere — TSL Node Material on WebGPU
+  // Core sphere — Animated TSL energy
   const sphereGeo = new THREE.IcosahedronGeometry(1.7, 3);
   let sphereMat;
+  let energyTime = null;
 
   if (usingWebGPU && TSL) {
-    const { vec3, float, sin, positionLocal, normalLocal } = TSL;
+    const { vec3, sin, positionLocal, normalLocal, uniform } = TSL;
     sphereMat = new THREE.MeshStandardNodeMaterial({
       metalness: 0.92,
       roughness: 0.18
     });
     sphereMat.colorNode = vec3(0.067, 0.067, 0.078);
-    const energy = sin(positionLocal.y.mul(3.0).add(normalLocal.x.mul(2.0))).mul(0.15).add(0.85);
-    sphereMat.emissiveNode = vec3(0.2, 0.0, 0.0).mul(energy);
-    console.log('ORVIX: Esfera con Shader Nodes (TSL) activa');
+
+    energyTime = uniform(0);
+    const spatial = sin(positionLocal.y.mul(3.0).add(normalLocal.x.mul(2.0)));
+    const pulse = sin(energyTime.mul(1.8)).mul(0.25).add(0.75);
+    const energy = spatial.mul(0.2).add(0.8).mul(pulse);
+    sphereMat.emissiveNode = vec3(0.25, 0.0, 0.0).mul(energy);
+
+    console.log('ORVIX: Esfera con energía animada (TSL) activa');
   } else {
     sphereMat = new THREE.MeshStandardMaterial({
       color: 0x111114,
@@ -214,6 +220,11 @@ async function initHeroSphere() {
     requestAnimationFrame(animate);
     if (!isVisible) return;
     time += 0.01;
+
+    if (energyTime) {
+      energyTime.value = time;
+    }
+
     sphere.rotation.y += mouseX * 0.008 + 0.0035;
     sphere.rotation.x += mouseY * 0.006 + 0.001;
     wire.rotation.copy(sphere.rotation);
