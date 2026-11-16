@@ -11,74 +11,82 @@ window.addEventListener('scroll', () => {
 
 function initHeroSphere() {
   const canvas = document.getElementById('hero-canvas');
-  if (!canvas || typeof THREE === 'undefined') {
-    console.error('THREE or canvas missing');
-    return;
-  }
+  if (!canvas || typeof THREE === 'undefined') return;
 
-  const size = 320;
+  const isMobile = window.innerWidth < 768;
+  const size = isMobile ? 280 : 360;
+
   canvas.style.width = size + 'px';
   canvas.style.height = size + 'px';
   canvas.style.display = 'block';
   canvas.style.margin = '0 auto';
 
   const scene = new THREE.Scene();
-  const camera = new THREE.PerspectiveCamera(32, 1, 0.1, 100);
-  camera.position.z = 3.8;
+  const camera = new THREE.PerspectiveCamera(34, 1, 0.1, 50);
+  camera.position.z = 3.9;
 
-  const renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true });
+  const renderer = new THREE.WebGLRenderer({
+    canvas,
+    alpha: true,
+    antialias: !isMobile,
+    powerPreference: 'low-power'
+  });
   renderer.setSize(size, size);
-  renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, isMobile ? 1 : 1.5));
   renderer.setClearColor(0x000000, 0);
 
-  // Much brighter sphere
-  const geo = new THREE.SphereGeometry(1.15, 64, 64);
+  // Adaptive sphere
+  const segments = isMobile ? 32 : 48;
+  const geo = new THREE.SphereGeometry(1.1, segments, segments);
   const mat = new THREE.MeshStandardMaterial({
-    color: 0x555560,
-    metalness: 0.85,
-    roughness: 0.2,
-    emissive: 0x331111,
-    emissiveIntensity: 0.15
+    color: 0x4a4a55,
+    metalness: 0.8,
+    roughness: 0.25,
+    emissive: 0x2a1010,
+    emissiveIntensity: 0.12
   });
   const sphere = new THREE.Mesh(geo, mat);
   scene.add(sphere);
 
-  // Visible wireframe
-  const wire = new THREE.Mesh(
-    new THREE.SphereGeometry(1.17, 32, 32),
-    new THREE.MeshBasicMaterial({ color: 0xff3355, wireframe: true, transparent: true, opacity: 0.35 })
-  );
-  scene.add(wire);
+  // Light wireframe on desktop only
+  let wire = null;
+  if (!isMobile) {
+    wire = new THREE.Mesh(
+      new THREE.SphereGeometry(1.12, 24, 24),
+      new THREE.MeshBasicMaterial({ color: 0xE32636, wireframe: true, transparent: true, opacity: 0.25 })
+    );
+    scene.add(wire);
+  }
 
-  // Bright core
+  // Core
   const core = new THREE.Mesh(
-    new THREE.SphereGeometry(0.35, 32, 32),
-    new THREE.MeshBasicMaterial({ color: 0xff1133, transparent: true, opacity: 0.8 })
+    new THREE.SphereGeometry(0.32, isMobile ? 16 : 24, isMobile ? 16 : 24),
+    new THREE.MeshBasicMaterial({ color: 0xff2244, transparent: true, opacity: 0.65 })
   );
   scene.add(core);
 
-  // Strong lights
-  scene.add(new THREE.AmbientLight(0xffffff, 0.7));
-  const key = new THREE.DirectionalLight(0xffffff, 1.5);
-  key.position.set(-5, 6, 8);
+  // Lights
+  scene.add(new THREE.AmbientLight(0xffffff, isMobile ? 0.55 : 0.65));
+  const key = new THREE.DirectionalLight(0xffffff, isMobile ? 1.0 : 1.3);
+  key.position.set(-4, 5, 6);
   scene.add(key);
-  const red = new THREE.PointLight(0xff2244, 8, 15);
-  red.position.set(2, 1, 4);
+  const red = new THREE.PointLight(0xE32636, isMobile ? 5 : 7, 12);
+  red.position.set(2, 1, 3);
   scene.add(red);
 
   let t = 0;
   function animate() {
     requestAnimationFrame(animate);
     t += 0.005;
-    sphere.rotation.y += 0.004;
-    wire.rotation.copy(sphere.rotation);
-    core.scale.setScalar(1 + Math.sin(t * 2.5) * 0.1);
-    red.position.x = Math.sin(t * 0.5) * 2.5;
-    red.position.z = Math.cos(t * 0.5) * 2.5;
+    sphere.rotation.y += 0.0035;
+    if (wire) wire.rotation.copy(sphere.rotation);
+    core.scale.setScalar(1 + Math.sin(t * 2) * 0.08);
+    red.position.x = Math.sin(t * 0.45) * 2.2;
+    red.position.z = Math.cos(t * 0.45) * 2.2;
     renderer.render(scene, camera);
   }
   animate();
-  console.log('ORVIX: Esfera brillante activa');
+  console.log('ORVIX: 3D móvil optimizado');
 }
 
 function handleSubmit(e) {
@@ -91,12 +99,12 @@ function handleSubmit(e) {
     msg.textContent = 'Completa los campos.';
     return;
   }
-  window.open(`https://wa.me/52?text=${encodeURIComponent('Hola ORVIX, soy ' + f.nombre.value + '. Me interesa: ' + f.servicio.value)}`, '_blank');
+  window.open(`https://wa.me/52?text=${encodeURIComponent('Hola ORVIX, soy ' + f.nombre.value)}`, '_blank');
   f.reset();
 }
 
 if (document.readyState === 'loading') {
   document.addEventListener('DOMContentLoaded', initHeroSphere);
 } else {
-  setTimeout(initHeroSphere, 100);
+  initHeroSphere();
 }
