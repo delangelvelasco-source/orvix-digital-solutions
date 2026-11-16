@@ -60,9 +60,10 @@ async function initHeroSphere() {
   }
 
   function setSize() {
-    const size = Math.min(parent.clientWidth, 520);
+    const isMobile = window.innerWidth < 768;
+    const size = Math.min(parent.clientWidth, isMobile ? 340 : 520);
     renderer.setSize(size, size);
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5));
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, isMobile ? 1.25 : 1.5));
     camera.aspect = 1;
     camera.updateProjectionMatrix();
   }
@@ -113,7 +114,7 @@ async function initHeroSphere() {
   const isMobile = window.innerWidth < 768 || /Android|iPhone|iPad|Mobile/i.test(navigator.userAgent);
 
   if (usingWebGPU && TSL) {
-    const particleCount = isMobile ? 240 : 480;
+    const particleCount = isMobile ? 180 : 480;
     const { Fn, instancedArray, instanceIndex, vec3, float, sin, cos, hash } = TSL;
 
     const positions = instancedArray(particleCount, 'vec3');
@@ -169,7 +170,7 @@ async function initHeroSphere() {
 
     console.log(`ORVIX: Compute GPU particles activas (${particleCount})`);
   } else {
-    const particleCount = isMobile ? 60 : 120;
+    const particleCount = isMobile ? 50 : 120;
     const positions = new Float32Array(particleCount * 3);
     for (let i = 0; i < particleCount; i++) {
       const radius = 2.2 + Math.random() * 1.2;
@@ -183,7 +184,7 @@ async function initHeroSphere() {
     particleGeo.setAttribute('position', new THREE.BufferAttribute(positions, 3));
     particles = new THREE.Points(particleGeo, new THREE.PointsMaterial({
       color: 0xE32636,
-      size: isMobile ? 0.028 : 0.032,
+      size: isMobile ? 0.026 : 0.032,
       sizeAttenuation: true,
       transparent: true,
       opacity: 0.65,
