@@ -20,7 +20,7 @@ window.addEventListener('scroll', () => {
   }
 });
 
-// Three.js Dual Renderer: WebGPU + TSL Compute Particles
+// Three.js Dual Renderer: WebGPU + TSL Nodes + Compute Particles
 async function initHeroSphere() {
   const canvas = document.getElementById('hero-canvas');
   if (!canvas) return;
@@ -68,8 +68,30 @@ async function initHeroSphere() {
   }
   setSize();
 
+  // Core sphere — TSL Node Material on WebGPU
   const sphereGeo = new THREE.IcosahedronGeometry(1.7, 3);
-  const sphereMat = new THREE.MeshStandardMaterial({ color: 0x111114, metalness: 0.92, roughness: 0.18, emissive: 0x330000, emissiveIntensity: 0.45 });
+  let sphereMat;
+
+  if (usingWebGPU && TSL) {
+    const { vec3, float, sin, positionLocal, normalLocal } = TSL;
+    sphereMat = new THREE.MeshStandardNodeMaterial({
+      metalness: 0.92,
+      roughness: 0.18
+    });
+    sphereMat.colorNode = vec3(0.067, 0.067, 0.078);
+    const energy = sin(positionLocal.y.mul(3.0).add(normalLocal.x.mul(2.0))).mul(0.15).add(0.85);
+    sphereMat.emissiveNode = vec3(0.2, 0.0, 0.0).mul(energy);
+    console.log('ORVIX: Esfera con Shader Nodes (TSL) activa');
+  } else {
+    sphereMat = new THREE.MeshStandardMaterial({
+      color: 0x111114,
+      metalness: 0.92,
+      roughness: 0.18,
+      emissive: 0x330000,
+      emissiveIntensity: 0.45
+    });
+  }
+
   const sphere = new THREE.Mesh(sphereGeo, sphereMat);
   scene.add(sphere);
 
