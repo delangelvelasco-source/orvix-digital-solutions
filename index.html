@@ -17,7 +17,6 @@
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-  <!-- Navigation -->
   <nav class="navbar">
     <div class="nav-container">
       <a href="#inicio" class="logo">OR<span>VIX</span></a>
@@ -35,7 +34,6 @@
     </div>
   </nav>
 
-  <!-- Mobile Menu -->
   <div class="mobile-menu" id="mobileMenu">
     <a href="#inicio" onclick="closeMobile()">Inicio</a>
     <a href="#soluciones" onclick="closeMobile()">Soluciones</a>
@@ -46,7 +44,6 @@
     <a href="#contacto" onclick="closeMobile()">Contacto</a>
   </div>
 
-  <!-- Hero -->
   <section class="hero" id="inicio">
     <div class="hero-content">
       <div class="hero-text">
@@ -64,10 +61,235 @@
     </div>
   </section>
 
-  <!-- Rest of content would be here - truncated for this push, full file to be updated -->
-  <p style="text-align:center;padding:4rem;">Sitio completo en construcción. Hero WebGL activo.</p>
+  <section id="soluciones">
+    <div class="section-header">
+      <div class="section-label">Nuestras Divisiones</div>
+      <h2>Tres frentes. Una visión.</h2>
+      <p>ORVIX opera a través de tres divisiones especializadas que cubren el espectro completo de la transformación digital.</p>
+    </div>
+    <div class="divisions-grid">
+      <article class="division-card">
+        <div class="division-icon">◈</div>
+        <h3>ORVIX WEB</h3>
+        <div class="division-tagline">Digital Experiences</div>
+        <p>Diseño y desarrollo de experiencias digitales que convierten visitantes en clientes.</p>
+        <ul>
+          <li>Desarrollo web</li>
+          <li>Páginas corporativas</li>
+          <li>Ecommerce</li>
+          <li>Tiendas en línea</li>
+          <li>Catálogos digitales</li>
+          <li>Rediseño web</li>
+          <li>Sistemas de reservaciones y citas</li>
+        </ul>
+      </article>
+      <article class="division-card" id="orvix-ai">
+        <div class="division-icon">◆</div>
+        <h3>ORVIX AI</h3>
+        <div class="division-tagline">Intelligence, Evolved</div>
+        <p>Asistentes inteligentes que automatizan la atención y aceleran la captación comercial.</p>
+        <ul>
+          <li>Asistentes inteligentes</li>
+          <li>Atención automatizada</li>
+          <li>Integración con WhatsApp</li>
+          <li>Chat web</li>
+          <li>Telegram</li>
+          <li>Consulta de productos y servicios</li>
+          <li>Captación de prospectos</li>
+          <li>Automatización comercial</li>
+        </ul>
+      </article>
+      <article class="division-card" id="orvix-systems">
+        <div class="division-icon">◇</div>
+        <h3>ORVIX SYSTEMS</h3>
+        <div class="division-tagline">Business Technology</div>
+        <p>Sistemas empresariales que ordenan operaciones y escalan con el negocio.</p>
+        <ul>
+          <li>Sistemas ERP</li>
+          <li>Paneles administrativos</li>
+          <li>Gestión empresarial</li>
+          <li>Automatización de operaciones</li>
+          <li>Sistemas personalizados</li>
+          <li>Integraciones tecnológicas</li>
+        </ul>
+      </article>
+    </div>
+  </section>
 
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-  <script src="script.js"></script>
+  <section id="precios">
+    <div class="section-header">
+      <div class="section-label">Catálogo Comercial</div>
+      <h2>Inversión clara. Resultados medibles.</h2>
+      <p>Precios en pesos mexicanos, sin IVA. Cotización personalizada según alcance del proyecto.</p>
+    </div>
+    <h3 style="margin-bottom: 1.5rem; font-size: 1.3rem;">Páginas Web</h3>
+    <div class="pricing-grid">
+      <div class="price-card">
+        <div class="price-name">Inicial</div>
+        <div class="price-amount">$3,500 <span>MXN</span></div>
+        <a href="#contacto" class="btn btn-secondary">Cotizar</a>
+      </div>
+      <div class="price-card featured">
+        <div class="price-name">Profesional</div>
+        <div class="price-amount">$5,500 <span>MXN</span></div>
+        <a href="#contacto" class="btn btn-primary">Cotizar</a>
+      </div>
+      <div class="price-card">
+        <div class="price-name">Premium</div>
+        <div class="price-amount">$8,500 <span>MXN</span></div>
+        <a href="#contacto" class="btn btn-secondary">Cotizar</a>
+      </div>
+    </div>
+    <h3 style="margin: 3rem 0 1.5rem; font-size: 1.3rem;">Otras Soluciones</h3>
+    <div class="other-solutions">
+      <div class="solution-item">ORVIX AI <span>desde $2,500</span></div>
+      <div class="solution-item">Catálogo dinámico <span>$1,200</span></div>
+      <div class="solution-item">Tienda en línea <span>$3,500</span></div>
+      <div class="solution-item">Integración de pasarelas <span>$1,000</span></div>
+      <div class="solution-item">Sistema de citas <span>$1,500</span></div>
+      <div class="solution-item">Panel administrativo <span>$1,800</span></div>
+      <div class="solution-item">Automatizaciones <span>$1,500</span></div>
+      <div class="solution-item">ERP empresarial <span>$15,000</span></div>
+      <div class="solution-item">Rediseño web <span>$900</span></div>
+    </div>
+  </section>
+
+  <section id="proyectos">
+    <div class="section-header">
+      <div class="section-label">Portafolio</div>
+      <h2>Demostraciones visuales</h2>
+      <p>Ejemplos de interfaces y plataformas que desarrollamos. Estas son demostraciones de capacidad, no proyectos de clientes reales.</p>
+    </div>
+    <div class="portfolio-grid">
+      <div class="portfolio-item">
+        <div class="portfolio-info">
+          <div class="demo-badge">DEMOSTRACIÓN</div>
+          <h4>Ecommerce & Dashboard</h4>
+          <p>Plataforma de comercio electrónico con panel administrativo en tiempo real.</p>
+        </div>
+      </div>
+      <div class="portfolio-item">
+        <div class="portfolio-info">
+          <div class="demo-badge">DEMOSTRACIÓN</div>
+          <h4>Sitio Corporativo</h4>
+          <p>Presencia digital premium para empresas que buscan posicionamiento de alto nivel.</p>
+        </div>
+      </div>
+      <div class="portfolio-item">
+        <div class="portfolio-info">
+          <div class="demo-badge">CONCEPTO</div>
+          <h4>Inteligencia & Sistemas</h4>
+          <p>Interfaces de inteligencia artificial y sistemas de gestión empresarial.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="nosotros">
+    <div class="about-content">
+      <div class="about-text">
+        <div class="section-label">Nosotros</div>
+        <h2>ORVIX — Beyond Digital.</h2>
+        <p>Somos una firma de soluciones tecnológicas que construye experiencias digitales, inteligencia artificial y sistemas empresariales con un estándar de ejecución internacional.</p>
+        <p>Nuestra filosofía es simple: la tecnología debe servir a la visión del negocio, no al revés. Cada proyecto se aborda con rigor técnico, claridad comercial y una identidad visual que distingue.</p>
+        <p style="margin-top: 1.5rem; color: var(--orvix-red); font-weight: 600; letter-spacing: 1px;">TU VISIÓN. NUESTRA TECNOLOGÍA.</p>
+      </div>
+      <div style="display: flex; align-items: center; justify-content: center;">
+        <div style="width: 280px; height: 280px; border-radius: 50%; background: radial-gradient(circle at 30% 30%, #2a2a2e, #090909); border: 1px solid var(--border); display: flex; align-items: center; justify-content: center;">
+          <span style="font-size: 3rem; font-weight: 800; letter-spacing: 4px;">OR<span style="color: var(--orvix-red);">VIX</span></span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="contacto" class="contact-section">
+    <div class="section-header">
+      <div class="section-label">Contacto</div>
+      <h2>Inicia tu proyecto</h2>
+      <p>Cuéntanos qué necesitas. Respondemos con una propuesta clara.</p>
+    </div>
+    <div class="contact-grid">
+      <div class="contact-info">
+        <h3>Hablemos de tu visión.</h3>
+        <p>La forma más directa de iniciar es por WhatsApp. También puedes usar el formulario.</p>
+        <a href="https://wa.me/52?text=Hola%20ORVIX%2C%20quiero%20iniciar%20un%20proyecto." class="whatsapp-btn" target="_blank" rel="noopener">
+          <span style="font-size: 1.3rem;">💬</span> Contactar por WhatsApp
+        </a>
+        <p style="margin-top: 2rem; font-size: 0.9rem;">Dominio oficial: <strong>orvixsd.lat</strong></p>
+      </div>
+      <form class="contact-form" id="contactForm" onsubmit="handleSubmit(event)">
+        <div class="form-row">
+          <div class="form-group">
+            <label for="nombre">Nombre</label>
+            <input type="text" id="nombre" name="nombre" required>
+          </div>
+          <div class="form-group">
+            <label for="empresa">Empresa</label>
+            <input type="text" id="empresa" name="empresa">
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="email">Correo electrónico</label>
+            <input type="email" id="email" name="email" required>
+          </div>
+          <div class="form-group">
+            <label for="whatsapp">WhatsApp</label>
+            <input type="tel" id="whatsapp" name="whatsapp" placeholder="+52 ...">
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="servicio">Servicio solicitado</label>
+          <select id="servicio" name="servicio" required>
+            <option value="">Selecciona...</option>
+            <option>ORVIX WEB — Página web</option>
+            <option>ORVIX WEB — Ecommerce</option>
+            <option>ORVIX AI</option>
+            <option>ORVIX SYSTEMS — ERP / Panel</option>
+            <option>Otro / Combinado</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="presupuesto">Presupuesto estimado</label>
+          <select id="presupuesto" name="presupuesto">
+            <option value="">Selecciona...</option>
+            <option>Menos de $5,000 MXN</option>
+            <option>$5,000 – $15,000 MXN</option>
+            <option>$15,000 – $50,000 MXN</option>
+            <option>Más de $50,000 MXN</option>
+            <option>Por definir</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="descripcion">Descripción del proyecto</label>
+          <textarea id="descripcion" name="descripcion" placeholder="Cuéntanos brevemente qué necesitas..." required></textarea>
+        </div>
+        <button type="submit" class="btn btn-primary" style="width: 100%; justify-content: center;">Enviar solicitud</button>
+        <p id="formMessage" style="margin-top: 1rem; text-align: center; display: none;"></p>
+      </form>
+    </div>
+  </section>
+
+  <footer>
+    <div class="footer-logo">OR<span style="color: var(--orvix-red);">VIX</span></div>
+    <div class="footer-slogan">TU VISIÓN. NUESTRA TECNOLOGÍA.</div>
+    <ul class="footer-links">
+      <li><a href="#soluciones">Soluciones</a></li>
+      <li><a href="#precios">Precios</a></li>
+      <li><a href="#proyectos">Proyectos</a></li>
+      <li><a href="#contacto">Contacto</a></li>
+    </ul>
+    <div class="copyright">© 2026 ORVIX Digital Solutions. Todos los derechos reservados.</div>
+  </footer>
+
+  <script type="importmap">
+  {
+    "imports": {
+      "three": "https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js",
+      "three/webgpu": "https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.webgpu.js"
+    }
+  }
+  </script>
+  <script type="module" src="script.js"></script>
 </body>
 </html>
