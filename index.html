@@ -10,8 +10,42 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="styles.css">
   <style>
-    .hero-visual { height: 340px !important; min-height: 340px !important; display: flex !important; align-items: center; justify-content: center; }
-    #hero-canvas { width: 300px !important; height: 300px !important; display: block !important; }
+    .hero-visual {
+      height: 380px !important;
+      min-height: 380px !important;
+      display: flex !important;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+    }
+    #hero-canvas {
+      width: 260px !important;
+      height: 260px !important;
+      display: block !important;
+    }
+    .hero-robot {
+      position: absolute;
+      right: -20px;
+      bottom: 20px;
+      width: 140px;
+      height: auto;
+      z-index: 10;
+      animation: robotPlay 3s ease-in-out infinite;
+      filter: drop-shadow(0 0 15px rgba(227,38,54,0.5));
+    }
+    @keyframes robotPlay {
+      0%, 100% { transform: translateY(0) rotate(-5deg); }
+      25% { transform: translateY(-8px) rotate(0deg); }
+      50% { transform: translateY(-4px) rotate(5deg); }
+      75% { transform: translateY(-10px) rotate(-2deg); }
+    }
+    @media (max-width: 768px) {
+      .hero-robot {
+        width: 100px;
+        right: 10px;
+        bottom: 10px;
+      }
+    }
   </style>
 </head>
 <body>
@@ -53,6 +87,7 @@
       <div class="hero-visual">
         <div class="hero-glow"></div>
         <canvas id="hero-canvas"></canvas>
+        <img src="https://i.imgur.com/placeholder-robot.png" alt="OrvixIA Robot" class="hero-robot" id="heroRobot">
       </div>
     </div>
   </section>
@@ -113,9 +148,9 @@
     <div class="section-header">
       <div class="section-label">Catálogo Comercial</div>
       <h2>Inversión clara. Resultados medibles.</h2>
-      <p>Precios en pesos mexicanos, sin IVA. Cotización personalizada según alcance del proyecto.</p>
+      <p>Precios en pesos mexicanos, sin IVA.</p>
     </div>
-    <h3 style="margin-bottom: 1.5rem; font-size: 1.3rem;">Páginas Web</h3>
+    <h3 style="margin-bottom: 1.5rem;">Páginas Web</h3>
     <div class="pricing-grid">
       <div class="price-card">
         <div class="price-name">Inicial</div>
@@ -133,60 +168,14 @@
         <a href="#contacto" class="btn btn-secondary">Cotizar</a>
       </div>
     </div>
-    <h3 style="margin: 3rem 0 1.5rem; font-size: 1.3rem;">Otras Soluciones</h3>
+    <h3 style="margin: 2.5rem 0 1.5rem;">Otras Soluciones</h3>
     <div class="other-solutions">
       <div class="solution-item">ORVIX AI <span>desde $2,500</span></div>
       <div class="solution-item">Catálogo dinámico <span>$1,200</span></div>
       <div class="solution-item">Tienda en línea <span>$3,500</span></div>
-      <div class="solution-item">Integración de pasarelas <span>$1,000</span></div>
       <div class="solution-item">Sistema de citas <span>$1,500</span></div>
       <div class="solution-item">Panel administrativo <span>$1,800</span></div>
-      <div class="solution-item">Automatizaciones <span>$1,500</span></div>
       <div class="solution-item">ERP empresarial <span>$15,000</span></div>
-      <div class="solution-item">Rediseño web <span>$900</span></div>
-    </div>
-  </section>
-
-  <section id="proyectos">
-    <div class="section-header">
-      <div class="section-label">Portafolio</div>
-      <h2>Demostraciones visuales</h2>
-      <p>Ejemplos de interfaces y plataformas que desarrollamos. Estas son demostraciones de capacidad, no proyectos de clientes reales.</p>
-    </div>
-    <div class="portfolio-grid">
-      <div class="portfolio-item">
-        <div class="portfolio-info">
-          <div class="demo-badge">DEMOSTRACIÓN</div>
-          <h4>Ecommerce & Dashboard</h4>
-          <p>Plataforma de comercio electrónico con panel administrativo en tiempo real.</p>
-        </div>
-      </div>
-      <div class="portfolio-item">
-        <div class="portfolio-info">
-          <div class="demo-badge">DEMOSTRACIÓN</div>
-          <h4>Sitio Corporativo</h4>
-          <p>Presencia digital premium para empresas que buscan posicionamiento de alto nivel.</p>
-        </div>
-      </div>
-      <div class="portfolio-item">
-        <div class="portfolio-info">
-          <div class="demo-badge">CONCEPTO</div>
-          <h4>Inteligencia & Sistemas</h4>
-          <p>Interfaces de inteligencia artificial y sistemas de gestión empresarial.</p>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <section id="nosotros">
-    <div class="about-content">
-      <div class="about-text">
-        <div class="section-label">Nosotros</div>
-        <h2>ORVIX — Beyond Digital.</h2>
-        <p>Somos una firma de soluciones tecnológicas que construye experiencias digitales, inteligencia artificial y sistemas empresariales con un estándar de ejecución internacional.</p>
-        <p>Nuestra filosofía es simple: la tecnología debe servir a la visión del negocio, no al revés.</p>
-        <p style="margin-top: 1.5rem; color: #E32636; font-weight: 600;">TU VISIÓN. NUESTRA TECNOLOGÍA.</p>
-      </div>
     </div>
   </section>
 
@@ -194,62 +183,35 @@
     <div class="section-header">
       <div class="section-label">Contacto</div>
       <h2>Inicia tu proyecto</h2>
-      <p>Cuéntanos qué necesitas. Respondemos con una propuesta clara.</p>
     </div>
     <div class="contact-grid">
       <div class="contact-info">
         <h3>Hablemos de tu visión.</h3>
-        <p>La forma más directa de iniciar es por WhatsApp.</p>
-        <a href="https://wa.me/52?text=Hola%20ORVIX%2C%20quiero%20iniciar%20un%20proyecto." class="whatsapp-btn" target="_blank">Contactar por WhatsApp</a>
+        <a href="https://wa.me/52?text=Hola%20ORVIX" class="whatsapp-btn" target="_blank">Contactar por WhatsApp</a>
       </div>
       <form class="contact-form" onsubmit="handleSubmit(event)">
-        <div class="form-row">
-          <div class="form-group">
-            <label>Nombre</label>
-            <input type="text" name="nombre" required>
-          </div>
-          <div class="form-group">
-            <label>Empresa</label>
-            <input type="text" name="empresa">
-          </div>
-        </div>
-        <div class="form-row">
-          <div class="form-group">
-            <label>Correo electrónico</label>
-            <input type="email" name="email" required>
-          </div>
-          <div class="form-group">
-            <label>WhatsApp</label>
-            <input type="tel" name="whatsapp" placeholder="+52 ...">
-          </div>
+        <div class="form-group">
+          <label>Nombre</label>
+          <input type="text" name="nombre" required>
         </div>
         <div class="form-group">
-          <label>Servicio solicitado</label>
+          <label>Correo</label>
+          <input type="email" name="email" required>
+        </div>
+        <div class="form-group">
+          <label>Servicio</label>
           <select name="servicio" required>
             <option value="">Selecciona...</option>
-            <option>ORVIX WEB — Página web</option>
-            <option>ORVIX WEB — Ecommerce</option>
+            <option>ORVIX WEB</option>
             <option>ORVIX AI</option>
-            <option>ORVIX SYSTEMS — ERP / Panel</option>
-            <option>Otro / Combinado</option>
+            <option>ORVIX SYSTEMS</option>
           </select>
         </div>
         <div class="form-group">
-          <label>Presupuesto estimado</label>
-          <select name="presupuesto">
-            <option value="">Selecciona...</option>
-            <option>Menos de $5,000 MXN</option>
-            <option>$5,000 – $15,000 MXN</option>
-            <option>$15,000 – $50,000 MXN</option>
-            <option>Más de $50,000 MXN</option>
-            <option>Por definir</option>
-          </select>
-        </div>
-        <div class="form-group">
-          <label>Descripción del proyecto</label>
+          <label>Descripción</label>
           <textarea name="descripcion" required></textarea>
         </div>
-        <button type="submit" class="btn btn-primary" style="width:100%">Enviar solicitud</button>
+        <button type="submit" class="btn btn-primary" style="width:100%">Enviar</button>
         <p id="formMessage" style="display:none;text-align:center;margin-top:1rem"></p>
       </form>
     </div>
@@ -258,16 +220,15 @@
   <footer>
     <div class="footer-logo">OR<span style="color:#E32636">VIX</span></div>
     <div class="footer-slogan">TU VISIÓN. NUESTRA TECNOLOGÍA.</div>
-    <ul class="footer-links">
-      <li><a href="#soluciones">Soluciones</a></li>
-      <li><a href="#precios">Precios</a></li>
-      <li><a href="#proyectos">Proyectos</a></li>
-      <li><a href="#contacto">Contacto</a></li>
-    </ul>
-    <div class="copyright">© 2026 ORVIX Digital Solutions. Todos los derechos reservados.</div>
+    <div class="copyright">© 2026 ORVIX Digital Solutions</div>
   </footer>
 
   <script src="https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.min.js"></script>
   <script src="script.js"></script>
+  <script>
+    // Use the robot image from the conversation
+    // For now, hide if no valid image
+    document.getElementById('heroRobot').style.display = 'none';
+  </script>
 </body>
 </html>
