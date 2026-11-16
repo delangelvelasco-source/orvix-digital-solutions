@@ -30,8 +30,13 @@
       width: 130px;
       height: auto;
       z-index: 10;
+      cursor: pointer;
       animation: robotPlay 3s ease-in-out infinite;
       filter: drop-shadow(0 0 15px rgba(227,38,54,0.5));
+      transition: transform 0.2s;
+    }
+    .hero-robot:hover {
+      transform: scale(1.05);
     }
     @keyframes robotPlay {
       0%, 100% { transform: translateY(0) rotate(-6deg); }
@@ -39,12 +44,81 @@
       50% { transform: translateY(-4px) rotate(5deg); }
       75% { transform: translateY(-10px) rotate(-2deg); }
     }
+    .ai-chat {
+      display: none;
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      width: 320px;
+      max-height: 420px;
+      background: #171719;
+      border: 1px solid rgba(227,38,54,0.3);
+      border-radius: 16px;
+      z-index: 2000;
+      overflow: hidden;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+    }
+    .ai-chat.active { display: flex; flex-direction: column; }
+    .ai-chat-header {
+      background: #E32636;
+      color: white;
+      padding: 12px 16px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-weight: 600;
+    }
+    .ai-chat-header button {
+      background: none;
+      border: none;
+      color: white;
+      font-size: 1.2rem;
+      cursor: pointer;
+    }
+    .ai-chat-messages {
+      flex: 1;
+      padding: 12px;
+      overflow-y: auto;
+      max-height: 280px;
+    }
+    .ai-msg {
+      background: #090909;
+      padding: 10px 12px;
+      border-radius: 10px;
+      margin-bottom: 8px;
+      font-size: 0.9rem;
+      line-height: 1.4;
+    }
+    .ai-msg.user {
+      background: #E32636;
+      margin-left: 30px;
+    }
+    .ai-chat-input {
+      display: flex;
+      padding: 10px;
+      border-top: 1px solid rgba(255,255,255,0.1);
+    }
+    .ai-chat-input input {
+      flex: 1;
+      padding: 10px;
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 8px;
+      background: #090909;
+      color: white;
+      font-size: 0.9rem;
+    }
+    .ai-chat-input button {
+      margin-left: 8px;
+      padding: 10px 14px;
+      background: #E32636;
+      border: none;
+      border-radius: 8px;
+      color: white;
+      cursor: pointer;
+    }
     @media (max-width: 768px) {
-      .hero-robot {
-        width: 100px;
-        right: 0;
-        bottom: 0;
-      }
+      .hero-robot { width: 100px; right: 0; bottom: 0; }
+      .ai-chat { width: 90%; right: 5%; bottom: 10px; }
     }
   </style>
 </head>
@@ -87,7 +161,7 @@
       <div class="hero-visual">
         <div class="hero-glow"></div>
         <canvas id="hero-canvas"></canvas>
-        <img src="robot.jpg.PNG" alt="OrvixIA Robot" class="hero-robot">
+        <img src="robot.jpg.PNG" alt="OrvixIA Robot" class="hero-robot" onclick="openAIChat()">
       </div>
     </div>
   </section>
@@ -223,7 +297,50 @@
     <div class="copyright">© 2026 ORVIX Digital Solutions</div>
   </footer>
 
+  <!-- AI Chat Panel -->
+  <div class="ai-chat" id="aiChat">
+    <div class="ai-chat-header">
+      <span>OrvixIA</span>
+      <button onclick="closeAIChat()">×</button>
+    </div>
+    <div class="ai-chat-messages" id="aiMessages">
+      <div class="ai-msg">¡Hola! Soy OrvixIA. ¿En qué puedo ayudarte hoy?</div>
+    </div>
+    <div class="ai-chat-input">
+      <input type="text" id="aiInput" placeholder="Escribe tu mensaje..." onkeypress="if(event.key==='Enter')sendAIMessage()">
+      <button onclick="sendAIMessage()">→</button>
+    </div>
+  </div>
+
   <script src="https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.min.js"></script>
   <script src="script.js"></script>
+  <script>
+    function openAIChat() {
+      document.getElementById('aiChat').classList.add('active');
+    }
+    function closeAIChat() {
+      document.getElementById('aiChat').classList.remove('active');
+    }
+    function sendAIMessage() {
+      const input = document.getElementById('aiInput');
+      const text = input.value.trim();
+      if (!text) return;
+      const msgs = document.getElementById('aiMessages');
+      msgs.innerHTML += '<div class="ai-msg user">' + text + '</div>';
+      input.value = '';
+      msgs.scrollTop = msgs.scrollHeight;
+      setTimeout(() => {
+        const responses = [
+          'Entendido. ¿Quieres que te conecte con el equipo de ORVIX?',
+          'Puedo ayudarte con información sobre nuestros servicios WEB, AI o SYSTEMS.',
+          'Si quieres iniciar un proyecto, usa el formulario de contacto o escríbenos por WhatsApp.',
+          '¡Claro! Cuéntame más sobre lo que necesitas.'
+        ];
+        const reply = responses[Math.floor(Math.random() * responses.length)];
+        msgs.innerHTML += '<div class="ai-msg">' + reply + '</div>';
+        msgs.scrollTop = msgs.scrollHeight;
+      }, 600);
+    }
+  </script>
 </body>
 </html>
