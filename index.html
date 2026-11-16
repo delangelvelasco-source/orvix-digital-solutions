@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ORVIX Digital Solutions | TU VISIÓN. NUESTRA TECNOLOGÍA.</title>
+  <meta name="description" content="ORVIX Digital Solutions transforma ideas en experiencias digitales, inteligencia artificial y soluciones tecnológicas. Desarrollo web, AI y sistemas empresariales en México.">
+  <meta name="keywords" content="ORVIX, desarrollo web, inteligencia artificial, sistemas ERP, ecommerce, Monterrey, México">
+  <meta property="og:title" content="ORVIX Digital Solutions | WE BUILD WHAT’S NEXT">
+  <meta property="og:description" content="Transformamos ideas en experiencias digitales, inteligencia artificial y soluciones tecnológicas que impulsan negocios.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://orvixsd.lat">
+  <meta name="theme-color" content="#090909">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <!-- Navigation -->
+  <nav class="navbar">
+    <div class="nav-container">
+      <a href="#inicio" class="logo">OR<span>VIX</span></a>
+      <ul class="nav-links">
+        <li><a href="#inicio">Inicio</a></li>
+        <li><a href="#soluciones">Soluciones</a></li>
+        <li><a href="#orvix-ai">ORVIX AI</a></li>
+        <li><a href="#orvix-systems">ORVIX Systems</a></li>
+        <li><a href="#proyectos">Proyectos</a></li>
+        <li><a href="#nosotros">Nosotros</a></li>
+        <li><a href="#contacto">Contacto</a></li>
+        <li><a href="#contacto" class="nav-cta">HABLEMOS DE TU PROYECTO</a></li>
+      </ul>
+      <button class="mobile-toggle" aria-label="Menú">☰</button>
+    </div>
+  </nav>
+
+  <!-- Mobile Menu -->
+  <div class="mobile-menu" id="mobileMenu">
+    <a href="#inicio" onclick="closeMobile()">Inicio</a>
+    <a href="#soluciones" onclick="closeMobile()">Soluciones</a>
+    <a href="#orvix-ai" onclick="closeMobile()">ORVIX AI</a>
+    <a href="#orvix-systems" onclick="closeMobile()">ORVIX Systems</a>
+    <a href="#proyectos" onclick="closeMobile()">Proyectos</a>
+    <a href="#nosotros" onclick="closeMobile()">Nosotros</a>
+    <a href="#contacto" onclick="closeMobile()">Contacto</a>
+  </div>
+
+  <!-- Hero -->
+  <section class="hero" id="inicio">
+    <div class="hero-content">
+      <div class="hero-text">
+        <h1 class="fade-in">WE BUILD<br><span>WHAT’S NEXT.</span></h1>
+        <p class="hero-subtitle fade-in delay-1">Transformamos ideas en experiencias digitales, inteligencia artificial y soluciones tecnológicas que impulsan negocios.</p>
+        <div class="hero-buttons fade-in delay-2">
+          <a href="#soluciones" class="btn btn-primary">EXPLORAR SOLUCIONES</a>
+          <a href="#contacto" class="btn btn-secondary">INICIAR UN PROYECTO</a>
+        </div>
+      </div>
+      <div class="hero-visual fade-in delay-3">
+        <div class="hero-glow"></div>
+        <canvas id="hero-canvas"></canvas>
+      </div>
+    </div>
+  </section>
+
+  <!-- Rest of content would be here - truncated for this push, full file to be updated -->
+  <p style="text-align:center;padding:4rem;">Sitio completo en construcción. Hero WebGL activo.</p>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>
