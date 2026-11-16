@@ -25,25 +25,25 @@
     }
     .hero-robot {
       position: absolute;
-      right: -20px;
-      bottom: 20px;
-      width: 140px;
+      right: -10px;
+      bottom: 0;
+      width: 120px;
       height: auto;
       z-index: 10;
       animation: robotPlay 3s ease-in-out infinite;
-      filter: drop-shadow(0 0 15px rgba(227,38,54,0.5));
+      filter: drop-shadow(0 0 12px rgba(227,38,54,0.6));
     }
     @keyframes robotPlay {
-      0%, 100% { transform: translateY(0) rotate(-5deg); }
-      25% { transform: translateY(-8px) rotate(0deg); }
-      50% { transform: translateY(-4px) rotate(5deg); }
-      75% { transform: translateY(-10px) rotate(-2deg); }
+      0%, 100% { transform: translateY(0) rotate(-8deg); }
+      25% { transform: translateY(-10px) rotate(0deg); }
+      50% { transform: translateY(-5px) rotate(6deg); }
+      75% { transform: translateY(-12px) rotate(-3deg); }
     }
     @media (max-width: 768px) {
       .hero-robot {
-        width: 100px;
-        right: 10px;
-        bottom: 10px;
+        width: 90px;
+        right: 5px;
+        bottom: 5px;
       }
     }
   </style>
@@ -87,7 +87,7 @@
       <div class="hero-visual">
         <div class="hero-glow"></div>
         <canvas id="hero-canvas"></canvas>
-        <img src="https://i.imgur.com/placeholder-robot.png" alt="OrvixIA Robot" class="hero-robot" id="heroRobot">
+        <img src="robot.svg" alt="OrvixIA Robot" class="hero-robot">
       </div>
     </div>
   </section>
@@ -225,10 +225,5 @@
 
   <script src="https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.min.js"></script>
   <script src="script.js"></script>
-  <script>
-    // Use the robot image from the conversation
-    // For now, hide if no valid image
-    document.getElementById('heroRobot').style.display = 'none';
-  </script>
 </body>
 </html>
