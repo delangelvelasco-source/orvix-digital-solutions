@@ -20,7 +20,7 @@ window.addEventListener('scroll', () => {
   }
 });
 
-// Three.js Dual Renderer: WebGPU + Interactive Attracting Particles
+// Three.js Dual Renderer: Optimized WebGPU
 async function initHeroSphere() {
   const canvas = document.getElementById('hero-canvas');
   if (!canvas) return;
@@ -63,32 +63,33 @@ async function initHeroSphere() {
     const isMobile = window.innerWidth < 768;
     const size = Math.min(parent.clientWidth, isMobile ? 340 : 520);
     renderer.setSize(size, size);
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, isMobile ? 1.25 : 1.5));
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, isMobile ? 1.0 : 1.25));
     camera.aspect = 1;
     camera.updateProjectionMatrix();
   }
   setSize();
 
-  // Core sphere — Animated TSL energy
-  const sphereGeo = new THREE.IcosahedronGeometry(1.7, 3);
+  // Adaptive quality
+  const isLowEnd = window.innerWidth < 768 || (navigator.hardwareConcurrency && navigator.hardwareConcurrency <= 4);
+  const sphereDetail = isLowEnd ? 2 : 3;
+  const sphereGeo = new THREE.IcosahedronGeometry(1.7, sphereDetail);
   let sphereMat;
   let energyTime = null;
 
   if (usingWebGPU && TSL) {
-    const { vec3, sin, positionLocal, normalLocal, uniform } = TSL;
+    const { vec3, sin, uniform } = TSL;
     sphereMat = new THREE.MeshStandardNodeMaterial({
       metalness: 0.92,
       roughness: 0.18
     });
     sphereMat.colorNode = vec3(0.067, 0.067, 0.078);
 
+    // Simplified energy pulse
     energyTime = uniform(0);
-    const spatial = sin(positionLocal.y.mul(3.0).add(normalLocal.x.mul(2.0)));
-    const pulse = sin(energyTime.mul(1.8)).mul(0.25).add(0.75);
-    const energy = spatial.mul(0.2).add(0.8).mul(pulse);
-    sphereMat.emissiveNode = vec3(0.25, 0.0, 0.0).mul(energy);
+    const pulse = sin(energyTime.mul(1.5)).mul(0.2).add(0.8);
+    sphereMat.emissiveNode = vec3(0.2, 0.0, 0.0).mul(pulse);
 
-    console.log('ORVIX: Esfera con energía animada (TSL) activa');
+    console.log('ORVIX: Esfera optimizada (TSL) activa');
   } else {
     sphereMat = new THREE.MeshStandardMaterial({
       color: 0x111114,
@@ -105,7 +106,7 @@ async function initHeroSphere() {
   const wire = new THREE.Mesh(sphereGeo, new THREE.MeshBasicMaterial({ color: 0xE32636, wireframe: true, transparent: true, opacity: 0.28 }));
   scene.add(wire);
 
-  const core = new THREE.Mesh(new THREE.SphereGeometry(0.85, 32, 32), new THREE.MeshBasicMaterial({ color: 0xE32636, transparent: true, opacity: 0.18 }));
+  const core = new THREE.Mesh(new THREE.SphereGeometry(0.85, isLowEnd ? 24 : 32, isLowEnd ? 24 : 32), new THREE.MeshBasicMaterial({ color: 0xE32636, transparent: true, opacity: 0.18 }));
   scene.add(core);
 
   // Particles with pointer attraction
@@ -115,7 +116,7 @@ async function initHeroSphere() {
   const isMobile = window.innerWidth < 768 || /Android|iPhone|iPad|Mobile/i.test(navigator.userAgent);
 
   if (usingWebGPU && TSL) {
-    const particleCount = isMobile ? 180 : 480;
+    const particleCount = isLowEnd ? 120 : 360;
     const { Fn, instancedArray, instanceIndex, vec3, float, sin, cos, hash } = TSL;
 
     const positions = instancedArray(particleCount, 'vec3');
@@ -156,7 +157,7 @@ async function initHeroSphere() {
       );
 
       const toPointer = pointerUniform.sub(basePos);
-      const attraction = toPointer.mul(0.08);
+      const attraction = toPointer.mul(0.06);
       pos.assign(basePos.add(attraction));
     })().compute(particleCount);
 
@@ -166,18 +167,18 @@ async function initHeroSphere() {
       blending: THREE.AdditiveBlending
     });
     material.positionNode = positions.toAttribute();
-    material.scaleNode = float(0.028);
+    material.scaleNode = float(0.026);
     material.colorNode = vec3(0.89, 0.15, 0.21);
-    material.opacityNode = float(0.7);
+    material.opacityNode = float(0.65);
 
     particles = new THREE.Sprite(material);
     particles.count = particleCount;
     particles.frustumCulled = false;
     scene.add(particles);
 
-    console.log(`ORVIX: Compute GPU particles con atracción (${particleCount})`);
+    console.log(`ORVIX: Partículas optimizadas (${particleCount})`);
   } else {
-    const particleCount = isMobile ? 50 : 120;
+    const particleCount = isMobile ? 40 : 100;
     const positions = new Float32Array(particleCount * 3);
     for (let i = 0; i < particleCount; i++) {
       const radius = 2.2 + Math.random() * 1.2;
@@ -191,10 +192,10 @@ async function initHeroSphere() {
     particleGeo.setAttribute('position', new THREE.BufferAttribute(positions, 3));
     particles = new THREE.Points(particleGeo, new THREE.PointsMaterial({
       color: 0xE32636,
-      size: isMobile ? 0.026 : 0.032,
+      size: isMobile ? 0.024 : 0.03,
       sizeAttenuation: true,
       transparent: true,
-      opacity: 0.65,
+      opacity: 0.6,
       blending: THREE.AdditiveBlending,
       depthWrite: false
     }));
@@ -242,11 +243,9 @@ async function initHeroSphere() {
       energyTime.value = time;
     }
 
-    // Smooth pointer follow
     pointerX += (targetPointerX - pointerX) * 0.08;
     pointerY += (targetPointerY - pointerY) * 0.08;
 
-    // Feed pointer to WebGPU compute
     if (pointerUniform) {
       pointerUniform.x = pointerX * 2.5;
       pointerUniform.y = pointerY * 2.5;
