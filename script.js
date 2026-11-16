@@ -19,87 +19,69 @@ window.addEventListener('scroll', () => {
   }
 });
 
-async function initHeroSphere() {
+function initHeroSphere() {
   const canvas = document.getElementById('hero-canvas');
-  if (!canvas) return;
+  if (!canvas || typeof THREE === 'undefined') {
+    console.error('Canvas or THREE not available');
+    return;
+  }
 
-  const isMobile = window.innerWidth < 768 || /Android|iPhone|iPad|Mobile/i.test(navigator.userAgent);
-  const parent = canvas.parentElement;
-  const size = Math.min(parent.clientWidth || 300, isMobile ? 300 : 420);
+  const isMobile = window.innerWidth < 768;
+  const size = isMobile ? 280 : 360;
 
   canvas.style.width = size + 'px';
   canvas.style.height = size + 'px';
   canvas.style.display = 'block';
   canvas.style.margin = '0 auto';
 
-  let THREE;
-  try {
-    THREE = await import('three');
-  } catch (e) {
-    console.error('Three.js failed', e);
-    return;
-  }
-
   const scene = new THREE.Scene();
-  const camera = new THREE.PerspectiveCamera(42, 1, 0.1, 50);
-  camera.position.z = 4.6;
+  const camera = new THREE.PerspectiveCamera(40, 1, 0.1, 50);
+  camera.position.z = 4.5;
 
   const renderer = new THREE.WebGLRenderer({
-    canvas,
+    canvas: canvas,
     alpha: true,
-    antialias: !isMobile,
-    powerPreference: 'low-power'
+    antialias: !isMobile
   });
   renderer.setSize(size, size);
-  renderer.setPixelRatio(Math.min(window.devicePixelRatio, isMobile ? 1 : 1.5));
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, isMobile ? 1 : 1.5));
   renderer.setClearColor(0x000000, 0);
 
-  // Adaptive geometry
-  const detail = isMobile ? 1 : 2;
-  const geo = new THREE.IcosahedronGeometry(1.45, detail);
+  // Sphere
+  const geo = new THREE.IcosahedronGeometry(1.4, isMobile ? 1 : 2);
   const mat = new THREE.MeshStandardMaterial({
-    color: 0x18181c,
-    metalness: 0.8,
-    roughness: 0.3,
-    emissive: 0x2a0000,
-    emissiveIntensity: isMobile ? 0.3 : 0.45
+    color: 0x1a1a1e,
+    metalness: 0.75,
+    roughness: 0.35,
+    emissive: 0x330000,
+    emissiveIntensity: 0.4
   });
   const sphere = new THREE.Mesh(geo, mat);
   scene.add(sphere);
 
-  // Wireframe only on desktop or very light on mobile
-  if (!isMobile) {
-    const wire = new THREE.Mesh(
-      new THREE.IcosahedronGeometry(1.48, 1),
-      new THREE.MeshBasicMaterial({ color: 0xE32636, wireframe: true, transparent: true, opacity: 0.2 })
-    );
-    scene.add(wire);
-    wire.rotation.copy = () => {};
-  }
-
   // Core
   const core = new THREE.Mesh(
-    new THREE.SphereGeometry(0.65, isMobile ? 16 : 24, isMobile ? 16 : 24),
-    new THREE.MeshBasicMaterial({ color: 0xE32636, transparent: true, opacity: 0.12 })
+    new THREE.SphereGeometry(0.6, 16, 16),
+    new THREE.MeshBasicMaterial({ color: 0xE32636, transparent: true, opacity: 0.2 })
   );
   scene.add(core);
 
   // Lights
   scene.add(new THREE.AmbientLight(0xffffff, 0.4));
-  const red = new THREE.PointLight(0xE32636, isMobile ? 1.8 : 2.2, 10);
-  red.position.set(2, 1, 2);
-  scene.add(red);
+  const redLight = new THREE.PointLight(0xE32636, 2, 10);
+  redLight.position.set(2, 1, 3);
+  scene.add(redLight);
 
-  // Fewer particles on mobile
-  const count = isMobile ? 40 : 90;
+  // Particles
+  const count = isMobile ? 30 : 60;
   const positions = new Float32Array(count * 3);
   for (let i = 0; i < count; i++) {
-    const r = 1.9 + Math.random() * 0.7;
+    const r = 1.8 + Math.random() * 0.6;
     const th = Math.random() * Math.PI * 2;
     const ph = Math.acos(2 * Math.random() - 1);
-    positions[i*3] = r * Math.sin(ph) * Math.cos(th);
-    positions[i*3+1] = r * Math.sin(ph) * Math.sin(th);
-    positions[i*3+2] = r * Math.cos(ph);
+    positions[i * 3] = r * Math.sin(ph) * Math.cos(th);
+    positions[i * 3 + 1] = r * Math.sin(ph) * Math.sin(th);
+    positions[i * 3 + 2] = r * Math.cos(ph);
   }
   const pGeo = new THREE.BufferGeometry();
   pGeo.setAttribute('position', new THREE.BufferAttribute(positions, 3));
@@ -107,12 +89,10 @@ async function initHeroSphere() {
     pGeo,
     new THREE.PointsMaterial({
       color: 0xE32636,
-      size: isMobile ? 0.03 : 0.022,
+      size: 0.04,
       sizeAttenuation: true,
       transparent: true,
-      opacity: 0.5,
-      blending: THREE.AdditiveBlending,
-      depthWrite: false
+      opacity: 0.5
     })
   );
   scene.add(particles);
@@ -120,19 +100,18 @@ async function initHeroSphere() {
   let t = 0;
   function animate() {
     requestAnimationFrame(animate);
-    t += 0.007;
-    sphere.rotation.y += 0.0035;
-    sphere.rotation.x = Math.sin(t * 0.25) * 0.1;
-    core.rotation.y = sphere.rotation.y * 1.1;
-    core.scale.setScalar(1 + Math.sin(t * 1.2) * 0.04);
-    red.position.x = Math.sin(t * 0.5) * 2;
-    red.position.z = Math.cos(t * 0.5) * 2;
-    particles.rotation.y = t * 0.06;
+    t += 0.008;
+    sphere.rotation.y += 0.004;
+    sphere.rotation.x = Math.sin(t * 0.3) * 0.1;
+    core.rotation.y = sphere.rotation.y * 1.2;
+    core.scale.setScalar(1 + Math.sin(t) * 0.05);
+    redLight.position.x = Math.sin(t * 0.5) * 2;
+    redLight.position.z = Math.cos(t * 0.5) * 2;
+    particles.rotation.y = t * 0.05;
     renderer.render(scene, camera);
   }
   animate();
-
-  console.log(`ORVIX: Esfera móvil optimizada (${isMobile ? 'mobile' : 'desktop'})`);
+  console.log('ORVIX: Esfera Safari-compatible lista');
 }
 
 function handleSubmit(e) {
@@ -153,4 +132,9 @@ function handleSubmit(e) {
   msg.textContent = 'Abriendo WhatsApp...';
 }
 
-document.addEventListener('DOMContentLoaded', initHeroSphere);
+// Wait for Three.js to load
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', initHeroSphere);
+} else {
+  initHeroSphere();
+}
