@@ -142,7 +142,7 @@ footer { background: #050505; border-top: 1px solid var(--border); padding: 3rem
 
 @media (max-width: 1024px) {
   .hero-content, .about-content, .contact-grid { grid-template-columns: 1fr; text-align: center; }
-  .hero-visual { height: 350px; order: -1; }
+  .hero-visual { height: 380px; order: -1; width: 100%; }
   .hero-buttons { justify-content: center; }
 }
 
@@ -152,9 +152,21 @@ footer { background: #050505; border-top: 1px solid var(--border); padding: 3rem
   .nav-container { padding: 0.75rem 1rem; }
   .logo { font-size: 1.3rem; }
   .hero { padding: 5rem 1rem 3rem; min-height: auto; }
-  .hero-visual { height: 280px; }
-  #hero-canvas { max-width: 280px; max-height: 280px; }
-  .hero-glow { width: 250px; height: 250px; }
+  .hero-visual {
+    height: 340px;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    order: -1;
+  }
+  #hero-canvas {
+    max-width: 340px;
+    max-height: 340px;
+    width: 100% !important;
+    height: 100% !important;
+  }
+  .hero-glow { width: 280px; height: 280px; }
   section { padding: 3.5rem 1rem; }
   .section-header { margin-bottom: 2.5rem; }
   .section-header h2 { font-size: 1.8rem; }
