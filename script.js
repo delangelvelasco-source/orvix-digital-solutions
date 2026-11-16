@@ -20,19 +20,25 @@ window.addEventListener('scroll', () => {
   }
 });
 
-// Three.js Dual Renderer: Optimized WebGPU
+// Robust Three.js Hero
 async function initHeroSphere() {
   const canvas = document.getElementById('hero-canvas');
-  if (!canvas) return;
+  if (!canvas) {
+    console.error('Canvas not found');
+    return;
+  }
 
-  let THREE, WebGPURenderer, TSL;
+  // Force canvas to be visible
+  canvas.style.display = 'block';
+  canvas.style.width = '100%';
+  canvas.style.height = '100%';
+  canvas.style.minHeight = '280px';
+
+  let THREE;
   try {
     THREE = await import('three');
-    const webgpuModule = await import('three/webgpu');
-    WebGPURenderer = webgpuModule.WebGPURenderer;
-    TSL = await import('three/tsl');
   } catch (e) {
-    console.warn('Modern Three.js / TSL not available.');
+    console.error('Three.js failed to load:', e);
     return;
   }
 
@@ -40,241 +46,128 @@ async function initHeroSphere() {
   const scene = new THREE.Scene();
   const camera = new THREE.PerspectiveCamera(45, 1, 0.1, 1000);
 
-  let renderer;
-  let usingWebGPU = false;
-
-  if (navigator.gpu && WebGPURenderer) {
-    try {
-      renderer = new WebGPURenderer({ canvas, alpha: true, antialias: true, powerPreference: 'high-performance' });
-      await renderer.init();
-      usingWebGPU = renderer.backend?.isWebGPUBackend ?? false;
-      console.log(usingWebGPU ? 'ORVIX Hero: WebGPU activo' : 'ORVIX Hero: WebGPU fallback a WebGL');
-    } catch (err) {
-      console.warn('WebGPU init failed:', err);
-    }
-  }
-
-  if (!renderer) {
-    renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true, powerPreference: 'high-performance' });
-    console.log('ORVIX Hero: WebGLRenderer');
-  }
+  // Always use WebGLRenderer for reliability
+  const renderer = new THREE.WebGLRenderer({
+    canvas,
+    alpha: true,
+    antialias: true,
+    powerPreference: 'high-performance'
+  });
+  console.log('ORVIX Hero: WebGLRenderer activo');
 
   function setSize() {
-    const isMobile = window.innerWidth < 768;
-    const size = Math.min(parent.clientWidth, isMobile ? 340 : 520);
+    const size = Math.min(parent.clientWidth || 340, window.innerWidth < 768 ? 340 : 520);
     renderer.setSize(size, size);
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, isMobile ? 1.0 : 1.25));
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.25));
     camera.aspect = 1;
     camera.updateProjectionMatrix();
   }
   setSize();
 
-  // Adaptive quality
-  const isLowEnd = window.innerWidth < 768 || (navigator.hardwareConcurrency && navigator.hardwareConcurrency <= 4);
-  const sphereDetail = isLowEnd ? 2 : 3;
-  const sphereGeo = new THREE.IcosahedronGeometry(1.7, sphereDetail);
-  let sphereMat;
-  let energyTime = null;
-
-  if (usingWebGPU && TSL) {
-    const { vec3, sin, uniform } = TSL;
-    sphereMat = new THREE.MeshStandardNodeMaterial({
-      metalness: 0.92,
-      roughness: 0.18
-    });
-    sphereMat.colorNode = vec3(0.067, 0.067, 0.078);
-
-    // Simplified energy pulse
-    energyTime = uniform(0);
-    const pulse = sin(energyTime.mul(1.5)).mul(0.2).add(0.8);
-    sphereMat.emissiveNode = vec3(0.2, 0.0, 0.0).mul(pulse);
-
-    console.log('ORVIX: Esfera optimizada (TSL) activa');
-  } else {
-    sphereMat = new THREE.MeshStandardMaterial({
-      color: 0x111114,
-      metalness: 0.92,
-      roughness: 0.18,
-      emissive: 0x330000,
-      emissiveIntensity: 0.45
-    });
-  }
-
+  // Simple reliable sphere
+  const sphereGeo = new THREE.IcosahedronGeometry(1.7, 2);
+  const sphereMat = new THREE.MeshStandardMaterial({
+    color: 0x111114,
+    metalness: 0.9,
+    roughness: 0.2,
+    emissive: 0x550000,
+    emissiveIntensity: 0.6
+  });
   const sphere = new THREE.Mesh(sphereGeo, sphereMat);
   scene.add(sphere);
 
-  const wire = new THREE.Mesh(sphereGeo, new THREE.MeshBasicMaterial({ color: 0xE32636, wireframe: true, transparent: true, opacity: 0.28 }));
+  // Wireframe
+  const wire = new THREE.Mesh(
+    sphereGeo,
+    new THREE.MeshBasicMaterial({ color: 0xE32636, wireframe: true, transparent: true, opacity: 0.3 })
+  );
   scene.add(wire);
 
-  const core = new THREE.Mesh(new THREE.SphereGeometry(0.85, isLowEnd ? 24 : 32, isLowEnd ? 24 : 32), new THREE.MeshBasicMaterial({ color: 0xE32636, transparent: true, opacity: 0.18 }));
+  // Core
+  const core = new THREE.Mesh(
+    new THREE.SphereGeometry(0.8, 24, 24),
+    new THREE.MeshBasicMaterial({ color: 0xE32636, transparent: true, opacity: 0.25 })
+  );
   scene.add(core);
 
-  // Particles with pointer attraction
-  let particles;
-  let computeUpdate = null;
-  let pointerUniform = null;
-  const isMobile = window.innerWidth < 768 || /Android|iPhone|iPad|Mobile/i.test(navigator.userAgent);
-
-  if (usingWebGPU && TSL) {
-    const particleCount = isLowEnd ? 120 : 360;
-    const { Fn, instancedArray, instanceIndex, vec3, float, sin, cos, hash } = TSL;
-
-    const positions = instancedArray(particleCount, 'vec3');
-    const phases = instancedArray(particleCount, 'float');
-    pointerUniform = vec3(0, 0, 0);
-
-    const computeInit = Fn(() => {
-      const idx = instanceIndex;
-      const radius = float(2.2).add(hash(idx).mul(1.3));
-      const theta = hash(idx.add(1)).mul(6.28318);
-      const phi = hash(idx.add(2)).mul(3.14159);
-      const pos = positions.element(idx);
-      pos.assign(vec3(
-        radius.mul(sin(phi)).mul(cos(theta)),
-        radius.mul(sin(phi)).mul(sin(theta)),
-        radius.mul(cos(phi))
-      ));
-      phases.element(idx).assign(hash(idx.add(3)).mul(6.28318));
-    })().compute(particleCount);
-
-    await renderer.computeAsync(computeInit);
-
-    computeUpdate = Fn(() => {
-      const idx = instanceIndex;
-      const pos = positions.element(idx);
-      const phase = phases.element(idx);
-      const speed = float(0.4).add(hash(idx).mul(0.6));
-      const newPhase = phase.add(speed.mul(0.016));
-      phases.element(idx).assign(newPhase);
-
-      const radius = pos.length();
-      const theta = newPhase;
-      const phi = hash(idx.add(4)).mul(3.14159);
-      const basePos = vec3(
-        radius.mul(sin(phi)).mul(cos(theta)),
-        radius.mul(sin(phi)).mul(sin(theta)),
-        radius.mul(cos(phi))
-      );
-
-      const toPointer = pointerUniform.sub(basePos);
-      const attraction = toPointer.mul(0.06);
-      pos.assign(basePos.add(attraction));
-    })().compute(particleCount);
-
-    const material = new THREE.SpriteNodeMaterial({
-      transparent: true,
-      depthWrite: false,
-      blending: THREE.AdditiveBlending
-    });
-    material.positionNode = positions.toAttribute();
-    material.scaleNode = float(0.026);
-    material.colorNode = vec3(0.89, 0.15, 0.21);
-    material.opacityNode = float(0.65);
-
-    particles = new THREE.Sprite(material);
-    particles.count = particleCount;
-    particles.frustumCulled = false;
-    scene.add(particles);
-
-    console.log(`ORVIX: Partículas optimizadas (${particleCount})`);
-  } else {
-    const particleCount = isMobile ? 40 : 100;
-    const positions = new Float32Array(particleCount * 3);
-    for (let i = 0; i < particleCount; i++) {
-      const radius = 2.2 + Math.random() * 1.2;
-      const theta = Math.random() * Math.PI * 2;
-      const phi = Math.acos(2 * Math.random() - 1);
-      positions[i * 3] = radius * Math.sin(phi) * Math.cos(theta);
-      positions[i * 3 + 1] = radius * Math.sin(phi) * Math.sin(theta);
-      positions[i * 3 + 2] = radius * Math.cos(phi);
-    }
-    const particleGeo = new THREE.BufferGeometry();
-    particleGeo.setAttribute('position', new THREE.BufferAttribute(positions, 3));
-    particles = new THREE.Points(particleGeo, new THREE.PointsMaterial({
+  // Simple particles
+  const particleCount = window.innerWidth < 768 ? 60 : 120;
+  const positions = new Float32Array(particleCount * 3);
+  for (let i = 0; i < particleCount; i++) {
+    const radius = 2.2 + Math.random() * 1.0;
+    const theta = Math.random() * Math.PI * 2;
+    const phi = Math.acos(2 * Math.random() - 1);
+    positions[i * 3] = radius * Math.sin(phi) * Math.cos(theta);
+    positions[i * 3 + 1] = radius * Math.sin(phi) * Math.sin(theta);
+    positions[i * 3 + 2] = radius * Math.cos(phi);
+  }
+  const particleGeo = new THREE.BufferGeometry();
+  particleGeo.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+  const particles = new THREE.Points(
+    particleGeo,
+    new THREE.PointsMaterial({
       color: 0xE32636,
-      size: isMobile ? 0.024 : 0.03,
+      size: 0.03,
       sizeAttenuation: true,
       transparent: true,
-      opacity: 0.6,
+      opacity: 0.7,
       blending: THREE.AdditiveBlending,
       depthWrite: false
-    }));
-    particles.frustumCulled = false;
-    scene.add(particles);
-  }
+    })
+  );
+  particles.frustumCulled = false;
+  scene.add(particles);
 
-  scene.add(new THREE.AmbientLight(0xffffff, 0.25));
-  const keyLight = new THREE.DirectionalLight(0xffffff, 0.7);
+  // Lights
+  scene.add(new THREE.AmbientLight(0xffffff, 0.3));
+  const keyLight = new THREE.DirectionalLight(0xffffff, 0.8);
   keyLight.position.set(-3, 4, 5);
   scene.add(keyLight);
-  const redLight1 = new THREE.PointLight(0xE32636, 3.5, 12);
-  scene.add(redLight1);
-  const redLight2 = new THREE.PointLight(0xff4466, 2, 8);
-  scene.add(redLight2);
+  const redLight = new THREE.PointLight(0xE32636, 4, 15);
+  scene.add(redLight);
 
   camera.position.z = 5.2;
 
-  // Interactive pointer (mouse + touch)
+  // Pointer
   let pointerX = 0, pointerY = 0;
-  let targetPointerX = 0, targetPointerY = 0;
+  let targetX = 0, targetY = 0;
 
-  function updatePointer(e) {
+  function onPointer(e) {
     const rect = canvas.getBoundingClientRect();
-    const clientX = e.touches ? e.touches[0].clientX : e.clientX;
-    const clientY = e.touches ? e.touches[0].clientY : e.clientY;
-    targetPointerX = ((clientX - rect.left) / rect.width) * 2 - 1;
-    targetPointerY = -((clientY - rect.top) / rect.height) * 2 + 1;
+    const cx = e.touches ? e.touches[0].clientX : e.clientX;
+    const cy = e.touches ? e.touches[0].clientY : e.clientY;
+    targetX = ((cx - rect.left) / rect.width) * 2 - 1;
+    targetY = -((cy - rect.top) / rect.height) * 2 + 1;
   }
-
-  window.addEventListener('mousemove', updatePointer);
-  window.addEventListener('touchmove', updatePointer, { passive: true });
+  window.addEventListener('mousemove', onPointer);
+  window.addEventListener('touchmove', onPointer, { passive: true });
 
   let time = 0;
-  let isVisible = true;
-  const observer = new IntersectionObserver((entries) => { isVisible = entries[0].isIntersecting; }, { threshold: 0.1 });
-  observer.observe(canvas);
-
   function animate() {
     requestAnimationFrame(animate);
-    if (!isVisible) return;
     time += 0.01;
 
-    if (energyTime) {
-      energyTime.value = time;
-    }
+    pointerX += (targetX - pointerX) * 0.08;
+    pointerY += (targetY - pointerY) * 0.08;
 
-    pointerX += (targetPointerX - pointerX) * 0.08;
-    pointerY += (targetPointerY - pointerY) * 0.08;
-
-    if (pointerUniform) {
-      pointerUniform.x = pointerX * 2.5;
-      pointerUniform.y = pointerY * 2.5;
-      pointerUniform.z = 0;
-    }
-
-    sphere.rotation.y += pointerX * 0.012 + 0.0035;
+    sphere.rotation.y += pointerX * 0.01 + 0.004;
     sphere.rotation.x += pointerY * 0.008 + 0.001;
     wire.rotation.copy(sphere.rotation);
-    core.rotation.y = sphere.rotation.y * 1.2;
-    core.scale.setScalar(1 + Math.sin(time * 2.5) * 0.06);
-    redLight1.position.x = Math.sin(time * 0.8) * 3.2;
-    redLight1.position.z = Math.cos(time * 0.8) * 3.2;
-    redLight2.position.x = Math.cos(time * 0.6) * 2.5;
-    redLight2.position.y = Math.sin(time * 1.1) * 1.8;
+    core.rotation.y = sphere.rotation.y * 1.3;
+    core.scale.setScalar(1 + Math.sin(time * 2) * 0.08);
 
-    if (computeUpdate && usingWebGPU) {
-      renderer.compute(computeUpdate);
-    }
+    redLight.position.x = Math.sin(time * 0.7) * 3;
+    redLight.position.z = Math.cos(time * 0.7) * 3;
 
-    if (particles && particles.isPoints) {
-      particles.rotation.y = time * 0.12 + pointerX * 0.3;
-      particles.rotation.x = time * 0.05 + pointerY * 0.2;
-    }
+    particles.rotation.y = time * 0.1 + pointerX * 0.2;
+    particles.rotation.x = time * 0.05 + pointerY * 0.15;
 
     renderer.render(scene, camera);
   }
   animate();
+
   window.addEventListener('resize', setSize);
+  console.log('ORVIX: Esfera inicializada correctamente');
 }
 
 function handleSubmit(e) {
