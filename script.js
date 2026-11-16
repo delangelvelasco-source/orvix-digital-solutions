@@ -20,71 +20,95 @@ function initHeroSphere() {
   canvas.style.margin = '0 auto';
 
   const scene = new THREE.Scene();
-  const camera = new THREE.PerspectiveCamera(30, 1, 0.1, 50);
-  camera.position.z = 3.6;
+  const camera = new THREE.PerspectiveCamera(28, 1, 0.1, 50);
+  camera.position.z = 3.8;
 
   const renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true });
   renderer.setSize(size, size);
   renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.5));
   renderer.setClearColor(0x000000, 0);
 
-  // Solid metallic sphere
-  const geo = new THREE.SphereGeometry(1.05, 48, 48);
-  const mat = new THREE.MeshStandardMaterial({
-    color: 0x2c2c32,
-    metalness: 0.92,
-    roughness: 0.18,
-    emissive: 0x1a0505,
-    emissiveIntensity: 0.1
+  // Core sphere
+  const coreGeo = new THREE.SphereGeometry(0.55, 32, 32);
+  const coreMat = new THREE.MeshStandardMaterial({
+    color: 0x1a1a1e,
+    metalness: 0.9,
+    roughness: 0.15,
+    emissive: 0x330000,
+    emissiveIntensity: 0.3
   });
-  const sphere = new THREE.Mesh(geo, mat);
-  scene.add(sphere);
+  const core = new THREE.Mesh(coreGeo, coreMat);
+  scene.add(core);
 
-  // Subtle wireframe overlay
-  const wire = new THREE.Mesh(
-    new THREE.SphereGeometry(1.06, 20, 20),
+  // Inner energy
+  const energy = new THREE.Mesh(
+    new THREE.SphereGeometry(0.25, 24, 24),
+    new THREE.MeshBasicMaterial({ color: 0xff2244, transparent: true, opacity: 0.8 })
+  );
+  scene.add(energy);
+
+  // Tech rings
+  const ringMat = new THREE.MeshBasicMaterial({
+    color: 0xE32636,
+    transparent: true,
+    opacity: 0.4,
+    side: THREE.DoubleSide
+  });
+
+  const ring1 = new THREE.Mesh(new THREE.TorusGeometry(0.95, 0.008, 8, 64), ringMat);
+  ring1.rotation.x = Math.PI / 2.2;
+  scene.add(ring1);
+
+  const ring2 = new THREE.Mesh(new THREE.TorusGeometry(1.15, 0.006, 8, 64), ringMat.clone());
+  ring2.material.opacity = 0.25;
+  ring2.rotation.x = Math.PI / 3;
+  ring2.rotation.y = 0.5;
+  scene.add(ring2);
+
+  const ring3 = new THREE.Mesh(new THREE.TorusGeometry(1.35, 0.004, 8, 48), ringMat.clone());
+  ring3.material.opacity = 0.15;
+  ring3.rotation.x = Math.PI / 4;
+  ring3.rotation.z = 0.3;
+  scene.add(ring3);
+
+  // Grid sphere
+  const grid = new THREE.Mesh(
+    new THREE.SphereGeometry(0.85, 16, 16),
     new THREE.MeshBasicMaterial({
       color: 0xE32636,
       wireframe: true,
       transparent: true,
-      opacity: 0.18
+      opacity: 0.2
     })
   );
-  scene.add(wire);
-
-  // Inner energy core
-  const core = new THREE.Mesh(
-    new THREE.SphereGeometry(0.28, 24, 24),
-    new THREE.MeshBasicMaterial({
-      color: 0xff1a3a,
-      transparent: true,
-      opacity: 0.7
-    })
-  );
-  scene.add(core);
+  scene.add(grid);
 
   // Lights
-  scene.add(new THREE.AmbientLight(0xffffff, 0.45));
-  const key = new THREE.DirectionalLight(0xffffff, 1.1);
+  scene.add(new THREE.AmbientLight(0xffffff, 0.4));
+  const key = new THREE.DirectionalLight(0xffffff, 0.9);
   key.position.set(-3, 4, 5);
   scene.add(key);
-  const red = new THREE.PointLight(0xE32636, 5, 10);
-  red.position.set(1.8, 0.8, 2.5);
+  const red = new THREE.PointLight(0xE32636, 4, 8);
+  red.position.set(1.5, 0.5, 2);
   scene.add(red);
-  const fill = new THREE.PointLight(0x4466ff, 1.5, 8);
-  fill.position.set(-1.5, -0.5, 2);
-  scene.add(fill);
 
   let t = 0;
   function animate() {
     requestAnimationFrame(animate);
-    t += 0.004;
-    sphere.rotation.y += 0.003;
-    sphere.rotation.x = Math.sin(t * 0.15) * 0.04;
-    wire.rotation.copy(sphere.rotation);
-    core.scale.setScalar(1 + Math.sin(t * 2.2) * 0.12);
-    red.position.x = Math.sin(t * 0.4) * 1.8;
-    red.position.z = Math.cos(t * 0.4) * 1.8;
+    t += 0.005;
+
+    core.rotation.y += 0.004;
+    grid.rotation.y -= 0.002;
+    grid.rotation.x += 0.001;
+
+    ring1.rotation.z = t * 0.3;
+    ring2.rotation.z = -t * 0.2;
+    ring3.rotation.y = t * 0.15;
+
+    energy.scale.setScalar(1 + Math.sin(t * 2.5) * 0.15);
+    red.position.x = Math.sin(t * 0.5) * 1.5;
+    red.position.z = Math.cos(t * 0.5) * 1.5;
+
     renderer.render(scene, camera);
   }
   animate();
