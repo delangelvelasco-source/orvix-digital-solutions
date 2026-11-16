@@ -40,11 +40,14 @@ async function initHeroSphere() {
   const camera = new THREE.PerspectiveCamera(45, 1, 0.1, 1000);
 
   let renderer;
+  let usingWebGPU = false;
+
   if (navigator.gpu && WebGPURenderer) {
     try {
       renderer = new WebGPURenderer({ canvas, alpha: true, antialias: true, powerPreference: 'high-performance' });
       await renderer.init();
-      console.log(renderer.backend?.isWebGPUBackend ? 'ORVIX Hero: WebGPU activo' : 'ORVIX Hero: WebGPU fallback a WebGL');
+      usingWebGPU = renderer.backend?.isWebGPUBackend ?? false;
+      console.log(usingWebGPU ? 'ORVIX Hero: WebGPU activo' : 'ORVIX Hero: WebGPU fallback a WebGL');
     } catch (err) {
       console.warn('WebGPU init failed:', err);
     }
@@ -75,11 +78,12 @@ async function initHeroSphere() {
   const core = new THREE.Mesh(new THREE.SphereGeometry(0.85, 32, 32), new THREE.MeshBasicMaterial({ color: 0xE32636, transparent: true, opacity: 0.18 }));
   scene.add(core);
 
-  const isMobile = window.innerWidth < 768;
-  const particleCount = isMobile ? 60 : 120;
+  // GPU-aware particles
+  const isMobile = window.innerWidth < 768 || /Android|iPhone|iPad|Mobile/i.test(navigator.userAgent);
+  const particleCount = usingWebGPU ? (isMobile ? 180 : 320) : (isMobile ? 60 : 120);
   const positions = new Float32Array(particleCount * 3);
   for (let i = 0; i < particleCount; i++) {
-    const radius = 2.2 + Math.random() * 1.2;
+    const radius = 2.1 + Math.random() * 1.4;
     const theta = Math.random() * Math.PI * 2;
     const phi = Math.acos(2 * Math.random() - 1);
     positions[i * 3] = radius * Math.sin(phi) * Math.cos(theta);
@@ -88,8 +92,21 @@ async function initHeroSphere() {
   }
   const particleGeo = new THREE.BufferGeometry();
   particleGeo.setAttribute('position', new THREE.BufferAttribute(positions, 3));
-  const particles = new THREE.Points(particleGeo, new THREE.PointsMaterial({ color: 0xE32636, size: 0.03, transparent: true, opacity: 0.65, blending: THREE.AdditiveBlending, depthWrite: false }));
+  const particles = new THREE.Points(particleGeo, new THREE.PointsMaterial({
+    color: 0xE32636,
+    size: usingWebGPU ? 0.026 : (isMobile ? 0.028 : 0.032),
+    sizeAttenuation: true,
+    transparent: true,
+    opacity: 0.7,
+    blending: THREE.AdditiveBlending,
+    depthWrite: false
+  }));
+  particles.frustumCulled = false;
   scene.add(particles);
+
+  if (usingWebGPU) {
+    console.log(`ORVIX: Partículas GPU-aware activas (${particleCount} puntos)`);
+  }
 
   scene.add(new THREE.AmbientLight(0xffffff, 0.25));
   const keyLight = new THREE.DirectionalLight(0xffffff, 0.7);
