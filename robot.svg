@@ -1,0 +1,43 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 280" width="200" height="280">
+  <defs>
+    <linearGradient id="bodyGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#f5f5f5"/>
+      <stop offset="100%" style="stop-color:#e0e0e0"/>
+    </linearGradient>
+    <filter id="glow">
+      <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
+      <feMerge>
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+  <ellipse cx="100" cy="200" rx="45" ry="50" fill="url(#bodyGrad)" stroke="#E32636" stroke-width="2"/>
+  <polygon points="100,175 115,190 100,205 85,190" fill="#1a1a1a" stroke="#E32636" stroke-width="1.5"/>
+  <circle cx="100" cy="190" r="6" fill="#E32636" filter="url(#glow)"/>
+  <ellipse cx="100" cy="100" rx="50" ry="45" fill="url(#bodyGrad)" stroke="#E32636" stroke-width="2"/>
+  <ellipse cx="100" cy="70" rx="35" ry="18" fill="#E32636"/>
+  <circle cx="100" cy="55" r="8" fill="#E32636"/>
+  <circle cx="100" cy="55" r="4" fill="#ff6688" filter="url(#glow)"/>
+  <ellipse cx="100" cy="105" rx="35" ry="25" fill="#0a0a0a"/>
+  <ellipse cx="85" cy="100" rx="8" ry="10" fill="#E32636" filter="url(#glow)"/>
+  <ellipse cx="115" cy="100" rx="8" ry="10" fill="#E32636" filter="url(#glow)"/>
+  <path d="M85 118 Q100 128 115 118" fill="none" stroke="#E32636" stroke-width="2" stroke-linecap="round"/>
+  <ellipse cx="52" cy="100" rx="12" ry="18" fill="#1a1a1a" stroke="#E32636" stroke-width="2"/>
+  <ellipse cx="148" cy="100" rx="12" ry="18" fill="#1a1a1a" stroke="#E32636" stroke-width="2"/>
+  <circle cx="52" cy="100" r="5" fill="#E32636"/>
+  <circle cx="148" cy="100" r="5" fill="#E32636"/>
+  <g transform="translate(40, 140)">
+    <ellipse cx="0" cy="20" rx="12" ry="25" fill="url(#bodyGrad)" stroke="#E32636" stroke-width="1.5"/>
+    <circle cx="0" cy="50" r="10" fill="url(#bodyGrad)" stroke="#E32636" stroke-width="1.5"/>
+    <ellipse cx="-8" cy="35" rx="6" ry="12" fill="url(#bodyGrad)" stroke="#E32636" stroke-width="1" transform="rotate(-30)"/>
+  </g>
+  <g transform="translate(160, 150)">
+    <ellipse cx="0" cy="15" rx="10" ry="20" fill="url(#bodyGrad)" stroke="#E32636" stroke-width="1.5"/>
+    <circle cx="0" cy="40" r="8" fill="url(#bodyGrad)" stroke="#E32636" stroke-width="1.5"/>
+  </g>
+  <ellipse cx="80" cy="250" rx="12" ry="20" fill="url(#bodyGrad)" stroke="#E32636" stroke-width="1.5"/>
+  <ellipse cx="120" cy="250" rx="12" ry="20" fill="url(#bodyGrad)" stroke="#E32636" stroke-width="1.5"/>
+  <ellipse cx="80" cy="268" rx="14" ry="6" fill="#1a1a1a"/>
+  <ellipse cx="120" cy="268" rx="14" ry="6" fill="#1a1a1a"/>
+</svg>
