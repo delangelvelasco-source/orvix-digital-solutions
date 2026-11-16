@@ -20,7 +20,7 @@ window.addEventListener('scroll', () => {
   }
 });
 
-// Three.js Dual Renderer: WebGPU + Interactive Particles
+// Three.js Dual Renderer: WebGPU + Interactive Attracting Particles
 async function initHeroSphere() {
   const canvas = document.getElementById('hero-canvas');
   if (!canvas) return;
@@ -108,9 +108,10 @@ async function initHeroSphere() {
   const core = new THREE.Mesh(new THREE.SphereGeometry(0.85, 32, 32), new THREE.MeshBasicMaterial({ color: 0xE32636, transparent: true, opacity: 0.18 }));
   scene.add(core);
 
-  // Particles: TSL Compute on WebGPU, Points fallback on WebGL
+  // Particles with pointer attraction
   let particles;
   let computeUpdate = null;
+  let pointerUniform = null;
   const isMobile = window.innerWidth < 768 || /Android|iPhone|iPad|Mobile/i.test(navigator.userAgent);
 
   if (usingWebGPU && TSL) {
@@ -119,6 +120,7 @@ async function initHeroSphere() {
 
     const positions = instancedArray(particleCount, 'vec3');
     const phases = instancedArray(particleCount, 'float');
+    pointerUniform = vec3(0, 0, 0);
 
     const computeInit = Fn(() => {
       const idx = instanceIndex;
@@ -143,14 +145,19 @@ async function initHeroSphere() {
       const speed = float(0.4).add(hash(idx).mul(0.6));
       const newPhase = phase.add(speed.mul(0.016));
       phases.element(idx).assign(newPhase);
+
       const radius = pos.length();
       const theta = newPhase;
       const phi = hash(idx.add(4)).mul(3.14159);
-      pos.assign(vec3(
+      const basePos = vec3(
         radius.mul(sin(phi)).mul(cos(theta)),
         radius.mul(sin(phi)).mul(sin(theta)),
         radius.mul(cos(phi))
-      ));
+      );
+
+      const toPointer = pointerUniform.sub(basePos);
+      const attraction = toPointer.mul(0.08);
+      pos.assign(basePos.add(attraction));
     })().compute(particleCount);
 
     const material = new THREE.SpriteNodeMaterial({
@@ -168,7 +175,7 @@ async function initHeroSphere() {
     particles.frustumCulled = false;
     scene.add(particles);
 
-    console.log(`ORVIX: Compute GPU particles activas (${particleCount})`);
+    console.log(`ORVIX: Compute GPU particles con atracción (${particleCount})`);
   } else {
     const particleCount = isMobile ? 50 : 120;
     const positions = new Float32Array(particleCount * 3);
@@ -238,6 +245,13 @@ async function initHeroSphere() {
     // Smooth pointer follow
     pointerX += (targetPointerX - pointerX) * 0.08;
     pointerY += (targetPointerY - pointerY) * 0.08;
+
+    // Feed pointer to WebGPU compute
+    if (pointerUniform) {
+      pointerUniform.x = pointerX * 2.5;
+      pointerUniform.y = pointerY * 2.5;
+      pointerUniform.z = 0;
+    }
 
     sphere.rotation.y += pointerX * 0.012 + 0.0035;
     sphere.rotation.x += pointerY * 0.008 + 0.001;
