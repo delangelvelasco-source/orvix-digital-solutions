@@ -20,18 +20,19 @@ window.addEventListener('scroll', () => {
   }
 });
 
-// Three.js Dual Renderer: WebGPU with WebGL fallback
+// Three.js Dual Renderer: WebGPU + TSL Compute Particles
 async function initHeroSphere() {
   const canvas = document.getElementById('hero-canvas');
   if (!canvas) return;
 
-  let THREE, WebGPURenderer;
+  let THREE, WebGPURenderer, TSL;
   try {
     THREE = await import('three');
     const webgpuModule = await import('three/webgpu');
     WebGPURenderer = webgpuModule.WebGPURenderer;
+    TSL = await import('three/tsl');
   } catch (e) {
-    console.warn('Modern Three.js not available');
+    console.warn('Modern Three.js / TSL not available.');
     return;
   }
 
@@ -78,34 +79,91 @@ async function initHeroSphere() {
   const core = new THREE.Mesh(new THREE.SphereGeometry(0.85, 32, 32), new THREE.MeshBasicMaterial({ color: 0xE32636, transparent: true, opacity: 0.18 }));
   scene.add(core);
 
-  // GPU-aware particles
+  // Particles: TSL Compute on WebGPU, Points fallback on WebGL
+  let particles;
+  let computeUpdate = null;
   const isMobile = window.innerWidth < 768 || /Android|iPhone|iPad|Mobile/i.test(navigator.userAgent);
-  const particleCount = usingWebGPU ? (isMobile ? 180 : 320) : (isMobile ? 60 : 120);
-  const positions = new Float32Array(particleCount * 3);
-  for (let i = 0; i < particleCount; i++) {
-    const radius = 2.1 + Math.random() * 1.4;
-    const theta = Math.random() * Math.PI * 2;
-    const phi = Math.acos(2 * Math.random() - 1);
-    positions[i * 3] = radius * Math.sin(phi) * Math.cos(theta);
-    positions[i * 3 + 1] = radius * Math.sin(phi) * Math.sin(theta);
-    positions[i * 3 + 2] = radius * Math.cos(phi);
-  }
-  const particleGeo = new THREE.BufferGeometry();
-  particleGeo.setAttribute('position', new THREE.BufferAttribute(positions, 3));
-  const particles = new THREE.Points(particleGeo, new THREE.PointsMaterial({
-    color: 0xE32636,
-    size: usingWebGPU ? 0.026 : (isMobile ? 0.028 : 0.032),
-    sizeAttenuation: true,
-    transparent: true,
-    opacity: 0.7,
-    blending: THREE.AdditiveBlending,
-    depthWrite: false
-  }));
-  particles.frustumCulled = false;
-  scene.add(particles);
 
-  if (usingWebGPU) {
-    console.log(`ORVIX: Partículas GPU-aware activas (${particleCount} puntos)`);
+  if (usingWebGPU && TSL) {
+    const particleCount = isMobile ? 240 : 480;
+    const { Fn, instancedArray, instanceIndex, vec3, float, sin, cos, hash } = TSL;
+
+    const positions = instancedArray(particleCount, 'vec3');
+    const phases = instancedArray(particleCount, 'float');
+
+    const computeInit = Fn(() => {
+      const idx = instanceIndex;
+      const radius = float(2.2).add(hash(idx).mul(1.3));
+      const theta = hash(idx.add(1)).mul(6.28318);
+      const phi = hash(idx.add(2)).mul(3.14159);
+      const pos = positions.element(idx);
+      pos.assign(vec3(
+        radius.mul(sin(phi)).mul(cos(theta)),
+        radius.mul(sin(phi)).mul(sin(theta)),
+        radius.mul(cos(phi))
+      ));
+      phases.element(idx).assign(hash(idx.add(3)).mul(6.28318));
+    })().compute(particleCount);
+
+    await renderer.computeAsync(computeInit);
+
+    computeUpdate = Fn(() => {
+      const idx = instanceIndex;
+      const pos = positions.element(idx);
+      const phase = phases.element(idx);
+      const speed = float(0.4).add(hash(idx).mul(0.6));
+      const newPhase = phase.add(speed.mul(0.016));
+      phases.element(idx).assign(newPhase);
+      const radius = pos.length();
+      const theta = newPhase;
+      const phi = hash(idx.add(4)).mul(3.14159);
+      pos.assign(vec3(
+        radius.mul(sin(phi)).mul(cos(theta)),
+        radius.mul(sin(phi)).mul(sin(theta)),
+        radius.mul(cos(phi))
+      ));
+    })().compute(particleCount);
+
+    const material = new THREE.SpriteNodeMaterial({
+      transparent: true,
+      depthWrite: false,
+      blending: THREE.AdditiveBlending
+    });
+    material.positionNode = positions.toAttribute();
+    material.scaleNode = float(0.028);
+    material.colorNode = vec3(0.89, 0.15, 0.21);
+    material.opacityNode = float(0.7);
+
+    particles = new THREE.Sprite(material);
+    particles.count = particleCount;
+    particles.frustumCulled = false;
+    scene.add(particles);
+
+    console.log(`ORVIX: Compute GPU particles activas (${particleCount})`);
+  } else {
+    const particleCount = isMobile ? 60 : 120;
+    const positions = new Float32Array(particleCount * 3);
+    for (let i = 0; i < particleCount; i++) {
+      const radius = 2.2 + Math.random() * 1.2;
+      const theta = Math.random() * Math.PI * 2;
+      const phi = Math.acos(2 * Math.random() - 1);
+      positions[i * 3] = radius * Math.sin(phi) * Math.cos(theta);
+      positions[i * 3 + 1] = radius * Math.sin(phi) * Math.sin(theta);
+      positions[i * 3 + 2] = radius * Math.cos(phi);
+    }
+    const particleGeo = new THREE.BufferGeometry();
+    particleGeo.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+    particles = new THREE.Points(particleGeo, new THREE.PointsMaterial({
+      color: 0xE32636,
+      size: isMobile ? 0.028 : 0.032,
+      sizeAttenuation: true,
+      transparent: true,
+      opacity: 0.65,
+      blending: THREE.AdditiveBlending,
+      depthWrite: false
+    }));
+    particles.frustumCulled = false;
+    scene.add(particles);
   }
 
   scene.add(new THREE.AmbientLight(0xffffff, 0.25));
@@ -143,8 +201,16 @@ async function initHeroSphere() {
     redLight1.position.z = Math.cos(time * 0.8) * 3.2;
     redLight2.position.x = Math.cos(time * 0.6) * 2.5;
     redLight2.position.y = Math.sin(time * 1.1) * 1.8;
-    particles.rotation.y = time * 0.12;
-    particles.rotation.x = time * 0.05;
+
+    if (computeUpdate && usingWebGPU) {
+      renderer.compute(computeUpdate);
+    }
+
+    if (particles && particles.isPoints) {
+      particles.rotation.y = time * 0.12;
+      particles.rotation.x = time * 0.05;
+    }
+
     renderer.render(scene, camera);
   }
   animate();
