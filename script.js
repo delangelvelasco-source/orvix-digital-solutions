@@ -20,7 +20,7 @@ window.addEventListener('scroll', () => {
   }
 });
 
-// Three.js Dual Renderer: WebGPU + Animated TSL Energy Sphere
+// Three.js Dual Renderer: WebGPU + Interactive Particles
 async function initHeroSphere() {
   const canvas = document.getElementById('hero-canvas');
   if (!canvas) return;
@@ -206,11 +206,20 @@ async function initHeroSphere() {
 
   camera.position.z = 5.2;
 
-  let mouseX = 0, mouseY = 0;
-  window.addEventListener('mousemove', (e) => {
-    mouseX = (e.clientX / window.innerWidth) * 2 - 1;
-    mouseY = -(e.clientY / window.innerHeight) * 2 + 1;
-  });
+  // Interactive pointer (mouse + touch)
+  let pointerX = 0, pointerY = 0;
+  let targetPointerX = 0, targetPointerY = 0;
+
+  function updatePointer(e) {
+    const rect = canvas.getBoundingClientRect();
+    const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+    const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+    targetPointerX = ((clientX - rect.left) / rect.width) * 2 - 1;
+    targetPointerY = -((clientY - rect.top) / rect.height) * 2 + 1;
+  }
+
+  window.addEventListener('mousemove', updatePointer);
+  window.addEventListener('touchmove', updatePointer, { passive: true });
 
   let time = 0;
   let isVisible = true;
@@ -226,8 +235,12 @@ async function initHeroSphere() {
       energyTime.value = time;
     }
 
-    sphere.rotation.y += mouseX * 0.008 + 0.0035;
-    sphere.rotation.x += mouseY * 0.006 + 0.001;
+    // Smooth pointer follow
+    pointerX += (targetPointerX - pointerX) * 0.08;
+    pointerY += (targetPointerY - pointerY) * 0.08;
+
+    sphere.rotation.y += pointerX * 0.012 + 0.0035;
+    sphere.rotation.x += pointerY * 0.008 + 0.001;
     wire.rotation.copy(sphere.rotation);
     core.rotation.y = sphere.rotation.y * 1.2;
     core.scale.setScalar(1 + Math.sin(time * 2.5) * 0.06);
@@ -241,8 +254,8 @@ async function initHeroSphere() {
     }
 
     if (particles && particles.isPoints) {
-      particles.rotation.y = time * 0.12;
-      particles.rotation.x = time * 0.05;
+      particles.rotation.y = time * 0.12 + pointerX * 0.3;
+      particles.rotation.x = time * 0.05 + pointerY * 0.2;
     }
 
     renderer.render(scene, camera);
