@@ -32,8 +32,7 @@ function initHeroSphere() {
   canvas.style.margin = '0 auto';
 
   const scene = new THREE.Scene();
-  // Volumetric fog
-  scene.fog = new THREE.FogExp2(0x1a0508, 0.08);
+  scene.fog = new THREE.FogExp2(0x150408, 0.06);
 
   const camera = new THREE.PerspectiveCamera(38, 1, 0.1, 50);
   camera.position.z = 4.2;
@@ -48,70 +47,105 @@ function initHeroSphere() {
   renderer.setClearColor(0x000000, 0);
 
   // Sphere
-  const geo = new THREE.IcosahedronGeometry(1.3, 2);
+  const geo = new THREE.IcosahedronGeometry(1.28, 2);
   const mat = new THREE.MeshStandardMaterial({
-    color: 0x25252a,
-    metalness: 0.88,
-    roughness: 0.18,
-    emissive: 0x440000,
-    emissiveIntensity: 0.4
+    color: 0x222228,
+    metalness: 0.85,
+    roughness: 0.2,
+    emissive: 0x3a0000,
+    emissiveIntensity: 0.3
   });
   const sphere = new THREE.Mesh(geo, mat);
   scene.add(sphere);
 
   // Wireframe
   const wire = new THREE.Mesh(
-    new THREE.IcosahedronGeometry(1.34, 1),
+    new THREE.IcosahedronGeometry(1.32, 1),
     new THREE.MeshBasicMaterial({
       color: 0xE32636,
       wireframe: true,
       transparent: true,
-      opacity: 0.3
+      opacity: 0.25
     })
   );
   scene.add(wire);
 
-  // Inner core with glow
+  // Core
   const core = new THREE.Mesh(
-    new THREE.SphereGeometry(0.5, 24, 24),
+    new THREE.SphereGeometry(0.45, 20, 20),
     new THREE.MeshBasicMaterial({
       color: 0xE32636,
       transparent: true,
-      opacity: 0.3
+      opacity: 0.35
     })
   );
   scene.add(core);
 
-  // Outer glow sphere (volumetric approximation)
-  const glowGeo = new THREE.SphereGeometry(1.8, 32, 32);
-  const glowMat = new THREE.MeshBasicMaterial({
-    color: 0xE32636,
+  // Mie scattering approximation: multiple glow layers
+  // Forward scatter (stronger in light direction)
+  const mieGeo = new THREE.SphereGeometry(1.6, 32, 32);
+  const mieMat = new THREE.ShaderMaterial({
     transparent: true,
-    opacity: 0.06,
-    side: THREE.BackSide
+    depthWrite: false,
+    blending: THREE.AdditiveBlending,
+    uniforms: {
+      uTime: { value: 0 },
+      uColor: { value: new THREE.Color(0xE32636) }
+    },
+    vertexShader: `
+      varying vec3 vNormal;
+      varying vec3 vViewDir;
+      void main() {
+        vNormal = normalize(normalMatrix * normal);
+        vec4 mvPos = modelViewMatrix * vec4(position, 1.0);
+        vViewDir = normalize(-mvPos.xyz);
+        gl_Position = projectionMatrix * mvPos;
+      }
+    `,
+    fragmentShader: `
+      uniform float uTime;
+      uniform vec3 uColor;
+      varying vec3 vNormal;
+      varying vec3 vViewDir;
+      void main() {
+        // Mie-like forward scattering approximation
+        float fresnel = pow(1.0 - abs(dot(vNormal, vViewDir)), 2.5);
+        float pulse = 0.6 + 0.4 * sin(uTime * 1.2);
+        float alpha = fresnel * 0.35 * pulse;
+        gl_FragColor = vec4(uColor, alpha);
+      }
+    `
   });
-  const glow = new THREE.Mesh(glowGeo, glowMat);
-  scene.add(glow);
+  const mieGlow = new THREE.Mesh(mieGeo, mieMat);
+  scene.add(mieGlow);
+
+  // Outer soft glow
+  const outerGlow = new THREE.Mesh(
+    new THREE.SphereGeometry(2.0, 24, 24),
+    new THREE.MeshBasicMaterial({
+      color: 0xE32636,
+      transparent: true,
+      opacity: 0.04,
+      side: THREE.BackSide
+    })
+  );
+  scene.add(outerGlow);
 
   // Lights
-  scene.add(new THREE.AmbientLight(0xffffff, 0.45));
-  const keyLight = new THREE.DirectionalLight(0xffffff, 0.7);
-  keyLight.position.set(-3, 4, 5);
+  scene.add(new THREE.AmbientLight(0xffffff, 0.4));
+  const keyLight = new THREE.DirectionalLight(0xffffff, 0.65);
+  keyLight.position.set(-2.5, 3.5, 4);
   scene.add(keyLight);
 
-  const redLight = new THREE.PointLight(0xE32636, 5, 18);
-  redLight.position.set(2.5, 1.5, 3);
+  const redLight = new THREE.PointLight(0xE32636, 4.5, 16);
+  redLight.position.set(2.2, 1.2, 2.8);
   scene.add(redLight);
 
-  const redLight2 = new THREE.PointLight(0xff2244, 2.5, 10);
-  redLight2.position.set(-2, -1, 2);
-  scene.add(redLight2);
-
   // Particles
-  const count = isMobile ? 45 : 70;
+  const count = isMobile ? 40 : 65;
   const positions = new Float32Array(count * 3);
   for (let i = 0; i < count; i++) {
-    const r = 1.85 + Math.random() * 0.6;
+    const r = 1.8 + Math.random() * 0.5;
     const th = Math.random() * Math.PI * 2;
     const ph = Math.acos(2 * Math.random() - 1);
     positions[i * 3] = r * Math.sin(ph) * Math.cos(th);
@@ -124,10 +158,10 @@ function initHeroSphere() {
     pGeo,
     new THREE.PointsMaterial({
       color: 0xE32636,
-      size: 0.04,
+      size: 0.038,
       sizeAttenuation: true,
       transparent: true,
-      opacity: 0.55,
+      opacity: 0.5,
       blending: THREE.AdditiveBlending,
       depthWrite: false
     })
@@ -138,21 +172,21 @@ function initHeroSphere() {
   function animate() {
     requestAnimationFrame(animate);
     t += 0.008;
-    sphere.rotation.y += 0.005;
-    sphere.rotation.x = Math.sin(t * 0.35) * 0.1;
+    sphere.rotation.y += 0.0045;
+    sphere.rotation.x = Math.sin(t * 0.3) * 0.08;
     wire.rotation.copy(sphere.rotation);
-    core.rotation.y = sphere.rotation.y * 1.4;
-    core.scale.setScalar(1 + Math.sin(t * 1.8) * 0.07);
-    glow.scale.setScalar(1 + Math.sin(t * 0.8) * 0.04);
-    glow.material.opacity = 0.05 + Math.sin(t * 1.2) * 0.02;
-    redLight.position.x = Math.sin(t * 0.55) * 2.6;
-    redLight.position.z = Math.cos(t * 0.55) * 2.6;
-    redLight2.position.y = Math.sin(t * 0.7) * 1.5;
-    particles.rotation.y = t * 0.06;
+    core.rotation.y = sphere.rotation.y * 1.25;
+    core.scale.setScalar(1 + Math.sin(t * 1.6) * 0.05);
+    mieGlow.material.uniforms.uTime.value = t;
+    mieGlow.scale.setScalar(1 + Math.sin(t * 0.7) * 0.03);
+    outerGlow.scale.setScalar(1 + Math.sin(t * 0.5) * 0.05);
+    redLight.position.x = Math.sin(t * 0.5) * 2.4;
+    redLight.position.z = Math.cos(t * 0.5) * 2.4;
+    particles.rotation.y = t * 0.055;
     renderer.render(scene, camera);
   }
   animate();
-  console.log('ORVIX: Iluminación volumétrica activa');
+  console.log('ORVIX: Mie scattering approximation activa');
 }
 
 function handleSubmit(e) {
