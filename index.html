@@ -314,33 +314,6 @@
 
   <script src="https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.min.js"></script>
   <script src="script.js"></script>
-  <script>
-    function openAIChat() {
-      document.getElementById('aiChat').classList.add('active');
-    }
-    function closeAIChat() {
-      document.getElementById('aiChat').classList.remove('active');
-    }
-    function sendAIMessage() {
-      const input = document.getElementById('aiInput');
-      const text = input.value.trim();
-      if (!text) return;
-      const msgs = document.getElementById('aiMessages');
-      msgs.innerHTML += '<div class="ai-msg user">' + text + '</div>';
-      input.value = '';
-      msgs.scrollTop = msgs.scrollHeight;
-      setTimeout(() => {
-        const responses = [
-          'Entendido. ¿Quieres que te conecte con el equipo de ORVIX?',
-          'Puedo ayudarte con información sobre nuestros servicios WEB, AI o SYSTEMS.',
-          'Si quieres iniciar un proyecto, usa el formulario de contacto o escríbenos por WhatsApp.',
-          '¡Claro! Cuéntame más sobre lo que necesitas.'
-        ];
-        const reply = responses[Math.floor(Math.random() * responses.length)];
-        msgs.innerHTML += '<div class="ai-msg">' + reply + '</div>';
-        msgs.scrollTop = msgs.scrollHeight;
-      }, 600);
-    }
-  </script>
+
 </body>
 </html>
