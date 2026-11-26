@@ -44,6 +44,30 @@
       50% { transform: translateY(-4px) rotate(5deg); }
       75% { transform: translateY(-10px) rotate(-2deg); }
     }
+    /* ORVIX IA — launcher fijo visible en todas las secciones */
+    #orvixAIButton {
+      position: fixed !important;
+      right: max(18px, env(safe-area-inset-right)) !important;
+      bottom: max(18px, env(safe-area-inset-bottom)) !important;
+      z-index: 2147483000 !important;
+      display: inline-flex !important;
+      align-items: center;
+      justify-content: center;
+      gap: 9px;
+      min-height: 54px;
+      padding: 0 21px;
+      border: 1px solid rgba(255,255,255,.22);
+      border-radius: 999px;
+      background: linear-gradient(135deg,#ed263d,#a90020);
+      color: #fff;
+      font: 700 14px/1 Inter, sans-serif;
+      letter-spacing: .1px;
+      cursor: pointer;
+      box-shadow: 0 8px 30px rgba(227,38,54,.38);
+      -webkit-tap-highlight-color: transparent;
+    }
+    #orvixAIButton:hover { filter: brightness(1.12); transform: translateY(-2px); }
+    #orvixAIButton:focus-visible { outline: 3px solid #fff; outline-offset: 3px; }
     .ai-chat {
       display: none;
       position: fixed;
@@ -296,6 +320,11 @@
     <div class="footer-slogan">TU VISIÓN. NUESTRA TECNOLOGÍA.</div>
     <div class="copyright">© 2026 ORVIX Digital Solutions</div>
   </footer>
+
+  <!-- Botón flotante ORVIX IA: visible durante toda la navegación -->
+  <button id="orvixAIButton" type="button" aria-label="Abrir chat de atención al cliente ORVIX IA" onclick="openAIChat()">
+    <span aria-hidden="true">✦</span> Hablar con ORVIX IA
+  </button>
 
   <!-- AI Chat Panel -->
   <div class="ai-chat" id="aiChat">
