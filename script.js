@@ -133,3 +133,154 @@ if (document.readyState === 'loading') {
 } else {
   initHeroSphere();
 }
+
+/* ORVIX IA — conexión real al Worker */
+(() => {
+  "use strict";
+
+  const API = "https://orvix-ai-dev.delangel-velasco.workers.dev/api/chat";
+  const SESSION_KEY = "orvix_ai_conversation_id";
+  let busy = false;
+
+  const $ = (selector) => document.querySelector(selector);
+
+  function message(text, type) {
+    const area = $("#aiMessages");
+    if (!area) return null;
+
+    const el = document.createElement("div");
+    el.className = `orvix-chat-message orvix-chat-${type}`;
+    el.textContent = text;
+    area.appendChild(el);
+    area.scrollTop = area.scrollHeight;
+    return el;
+  }
+
+  window.openAIChat = function () {
+    const panel = $("#aiChat");
+    if (!panel) {
+      console.error("ORVIX IA: falta el elemento #aiChat");
+      return;
+    }
+
+    panel.style.setProperty("display", "flex", "important");
+    panel.classList.add("orvix-ai-open");
+    panel.setAttribute("aria-hidden", "false");
+
+    setTimeout(() => $("#aiInput")?.focus(), 100);
+  };
+
+  window.closeAIChat = function () {
+    const panel = $("#aiChat");
+    if (!panel) return;
+
+    panel.classList.remove("orvix-ai-open");
+    panel.style.setProperty("display", "none", "important");
+    panel.setAttribute("aria-hidden", "true");
+  };
+
+  window.sendAIMessage = async function () {
+    const input = $("#aiInput");
+    if (!input || busy) return;
+
+    const text = input.value.trim();
+    if (!text) return;
+
+    if (text.length > 4000) {
+      message("El mensaje supera el límite de 4,000 caracteres.", "error");
+      return;
+    }
+
+    busy = true;
+    input.value = "";
+    input.disabled = true;
+
+    message(text, "user");
+    const typing = message("ORVIX IA está escribiendo…", "typing");
+
+    try {
+      let conversationId = "";
+      try {
+        conversationId = sessionStorage.getItem(SESSION_KEY) || "";
+      } catch {}
+
+      const response = await fetch(API, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          message: text,
+          ...(conversationId ? { conversationId } : {})
+        })
+      });
+
+      const data = await response.json();
+
+      if (!response.ok || data.success !== true ||
+          typeof data.reply !== "string") {
+        throw new Error(data.error || data.code || `HTTP ${response.status}`);
+      }
+
+      if (data.conversationId) {
+        try {
+          sessionStorage.setItem(SESSION_KEY, data.conversationId);
+        } catch {}
+      }
+
+      typing?.remove();
+      message(data.reply, "assistant");
+
+    } catch (error) {
+      typing?.remove();
+      console.error("ORVIX IA:", error);
+      message(
+        "No pude conectar con ORVIX IA. Intenta nuevamente.",
+        "error"
+      );
+    } finally {
+      busy = false;
+      input.disabled = false;
+      input.focus();
+    }
+  };
+
+  function initialize() {
+    if (!$("#aiChat") || !$("#aiMessages") || !$("#aiInput")) {
+      console.error("ORVIX IA: faltan elementos del chat en index.html");
+      return;
+    }
+
+    if (!$("#orvixAIButton")) {
+      const launcher = document.createElement("button");
+      launcher.id = "orvixAIButton";
+      launcher.type = "button";
+      launcher.textContent = "✦ Hablar con ORVIX IA";
+      launcher.addEventListener("click", window.openAIChat);
+      document.body.appendChild(launcher);
+    }
+
+    const input = $("#aiInput");
+    if (!input.dataset.orvixBound) {
+      input.dataset.orvixBound = "true";
+      input.addEventListener("keydown", (event) => {
+        if (event.key === "Enter" &&
+            !(event.shiftKey && input.tagName === "TEXTAREA")) {
+          event.preventDefault();
+          window.sendAIMessage();
+        }
+      });
+    }
+
+    const close = document.querySelector(
+      "#aiChat [onclick*='closeAIChat']"
+    );
+    close?.addEventListener("click", window.closeAIChat);
+
+    window.closeAIChat();
+  }
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", initialize, { once: true });
+  } else {
+    initialize();
+  }
+})();
