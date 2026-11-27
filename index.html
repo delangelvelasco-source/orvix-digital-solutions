@@ -329,8 +329,11 @@
   <!-- AI Chat Panel -->
   <div class="ai-chat" id="aiChat">
     <div class="ai-chat-header">
-      <span>OrvixIA</span>
-      <button onclick="closeAIChat()">×</button>
+      <div class="orvix-ai-identity">
+        <img src="robot.jpg.PNG" alt="" class="orvix-ai-chat-avatar">
+        <div><strong>ORVIX IA</strong><small><i></i> En línea</small></div>
+      </div>
+      <button type="button" onclick="closeAIChat()" aria-label="Cerrar chat">×</button>
     </div>
     <div class="ai-chat-messages" id="aiMessages">
       <div class="ai-msg">¡Hola! Soy OrvixIA. ¿En qué puedo ayudarte hoy?</div>
