@@ -166,6 +166,8 @@ if (document.readyState === 'loading') {
     panel.style.setProperty("display", "flex", "important");
     panel.classList.add("orvix-ai-open");
     panel.setAttribute("aria-hidden", "false");
+    const launcher = $("#orvixAIButton");
+    if (launcher) launcher.classList.add("orvix-ai-launcher-hidden");
 
     setTimeout(() => $("#aiInput")?.focus(), 100);
   };
@@ -177,6 +179,8 @@ if (document.readyState === 'loading') {
     panel.classList.remove("orvix-ai-open");
     panel.style.setProperty("display", "none", "important");
     panel.setAttribute("aria-hidden", "true");
+    const launcher = $("#orvixAIButton");
+    if (launcher) launcher.classList.remove("orvix-ai-launcher-hidden");
   };
 
   window.sendAIMessage = async function () {
@@ -232,10 +236,14 @@ if (document.readyState === 'loading') {
     } catch (error) {
       typing?.remove();
       console.error("ORVIX IA:", error);
-      message(
-        "No pude conectar con ORVIX IA. Intenta nuevamente.",
-        "error"
-      );
+      const reason = !navigator.onLine
+        ? "No hay conexión a internet. Revisa tu conexión e inténtalo de nuevo."
+        : (error && (error.name === "AbortError" || error.name === "TimeoutError"))
+          ? "ORVIX IA tardó demasiado en responder. Inténtalo nuevamente."
+          : (error && error.message && error.message.includes("Failed to fetch"))
+            ? "No se pudo conectar con el servidor. Puede ser un problema de red o de configuración CORS."
+            : "No fue posible conectar con ORVIX IA. " + (error?.message || "Intenta nuevamente.");
+      message(reason, "error");
     } finally {
       busy = false;
       input.disabled = false;
