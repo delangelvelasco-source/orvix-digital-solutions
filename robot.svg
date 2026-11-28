@@ -4,25 +4,23 @@
     <linearGradient id="edge" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff"/><stop offset="1" stop-color="#aab4c0"/></linearGradient>
     <linearGradient id="face" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#20232a"/><stop offset="1" stop-color="#050609"/></linearGradient>
     <linearGradient id="red" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ff657a"/><stop offset=".55" stop-color="#ed1d3b"/><stop offset="1" stop-color="#9d001e"/></linearGradient>
-    <filter id="redGlow" x="-100%" y="-100%" width="300%" height="300%"><feGaussianBlur stdDeviation="4" result="blur"/><feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
-    <filter id="softShadow" x="-50%" y="-40%" width="200%" height="200%"><feGaussianBlur in="SourceAlpha" stdDeviation="5" result="blur"/><feOffset dy="4" result="offset"/><feComponentTransfer><feFuncA type="linear" slope=".28"/></feComponentTransfer><feMerge><feMergeNode/><feMergeNode in="SourceGraphic"/></feMerge></filter>
   </defs>
-  <ellipse cx="118" cy="278" rx="65" ry="7" fill="#e32636" opacity=".18" filter="url(#redGlow)"/>
-  <path d="M120 24V12" stroke="#c5cbd3" stroke-width="7" stroke-linecap="round"/><circle cx="120" cy="10" r="7" fill="url(#red)" filter="url(#redGlow)"/>
+  <ellipse cx="118" cy="278" rx="65" ry="7" fill="#e32636" opacity=".18"/>
+  <path d="M120 24V12" stroke="#c5cbd3" stroke-width="7" stroke-linecap="round"/><circle cx="120" cy="10" r="7" fill="url(#red)"/>
   <rect x="29" y="73" width="24" height="49" rx="12" fill="url(#face)" stroke="#e32636" stroke-width="3"/><rect x="187" y="73" width="24" height="49" rx="12" fill="url(#face)" stroke="#e32636" stroke-width="3"/>
-  <circle cx="41" cy="97" r="6" fill="#ff344f" filter="url(#redGlow)"/><circle cx="199" cy="97" r="6" fill="#ff344f" filter="url(#redGlow)"/>
-  <g filter="url(#softShadow)">
+  <circle cx="41" cy="97" r="6" fill="#ff344f"/><circle cx="199" cy="97" r="6" fill="#ff344f"/>
+  <g>
     <rect x="48" y="27" width="144" height="128" rx="43" fill="url(#shell)" stroke="#fff" stroke-width="2"/>
     <path d="M66 55Q78 34 111 34H145Q174 34 183 58" fill="none" stroke="#fff" stroke-width="5" opacity=".75" stroke-linecap="round"/>
     <rect x="65" y="61" width="110" height="69" rx="25" fill="url(#face)" stroke="#323640" stroke-width="2"/>
-    <ellipse cx="94" cy="91" rx="9" ry="12" fill="#ff2948" filter="url(#redGlow)"/><ellipse cx="146" cy="91" rx="9" ry="12" fill="#ff2948" filter="url(#redGlow)"/>
-    <path d="M99 111Q120 126 141 111" fill="none" stroke="#f52b49" stroke-width="3.5" stroke-linecap="round" filter="url(#redGlow)"/>
+    <ellipse cx="94" cy="91" rx="9" ry="12" fill="#ff2948"/><ellipse cx="146" cy="91" rx="9" ry="12" fill="#ff2948"/>
+    <path d="M99 111Q120 126 141 111" fill="none" stroke="#f52b49" stroke-width="3.5" stroke-linecap="round"/>
   </g>
   <rect x="105" y="148" width="30" height="18" rx="8" fill="#aeb8c4"/>
-  <g filter="url(#softShadow)">
+  <g>
     <path d="M78 165Q82 153 98 153H142Q158 153 162 165L174 224Q176 239 160 241H80Q64 239 66 224Z" fill="url(#shell)" stroke="#fff" stroke-width="2"/>
     <path d="M88 170Q120 159 152 170" fill="none" stroke="#fff" stroke-width="4" opacity=".7" stroke-linecap="round"/>
-    <path d="M120 183L136 199L120 215L104 199Z" fill="#242832" stroke="#e32636" stroke-width="2"/><circle cx="120" cy="199" r="6" fill="#f02b49" filter="url(#redGlow)"/>
+    <path d="M120 183L136 199L120 215L104 199Z" fill="#242832" stroke="#e32636" stroke-width="2"/><circle cx="120" cy="199" r="6" fill="#f02b49"/>
   </g>
   <path d="M75 177Q57 181 51 198L44 220" fill="none" stroke="url(#edge)" stroke-width="18" stroke-linecap="round"/><circle cx="43" cy="224" r="11" fill="url(#shell)" stroke="#d5dbe2" stroke-width="2"/>
   <path d="M164 177Q181 177 188 160L193 143" fill="none" stroke="url(#edge)" stroke-width="18" stroke-linecap="round"/>
