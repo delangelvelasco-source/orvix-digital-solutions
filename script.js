@@ -117,7 +117,12 @@ function initHeroSphere() {
 
   resizeSphere();
   window.addEventListener('resize', resizeSphere, { passive: true });
-  mobileQuery.addEventListener('change', resizeSphere);
+  if (typeof mobileQuery.addEventListener === 'function') {
+    mobileQuery.addEventListener('change', resizeSphere);
+  } else if (typeof mobileQuery.addListener === 'function') {
+    // Compatibilidad con versiones anteriores de Safari en iOS.
+    mobileQuery.addListener(resizeSphere);
+  }
 
   if (typeof ResizeObserver !== 'undefined') {
     const observer = new ResizeObserver(resizeSphere);
