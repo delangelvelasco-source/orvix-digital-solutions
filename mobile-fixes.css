@@ -52,9 +52,9 @@
     border-radius: 0 !important;
     box-shadow: none !important;
     rotate: none !important;
-    mix-blend-mode: lighten;
-    -webkit-mask-image: radial-gradient(ellipse 56% 58% at 50% 50%, #000 56%, rgba(0,0,0,.82) 72%, transparent 100%);
-    mask-image: radial-gradient(ellipse 56% 58% at 50% 50%, #000 56%, rgba(0,0,0,.82) 72%, transparent 100%);
+    mix-blend-mode: normal;
+    -webkit-mask-image: none;
+    mask-image: none;
     filter: drop-shadow(0 0 7px rgba(227,38,54,.38));
     animation: orvixRobotFloat 4s ease-in-out infinite !important;
   }
