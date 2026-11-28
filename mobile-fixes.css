@@ -33,7 +33,6 @@
     border: 0 !important;
     border-radius: 0 !important;
     box-shadow: none !important;
-    transform: none !important;
     rotate: none !important;
     mix-blend-mode: screen;
     -webkit-mask-image: radial-gradient(ellipse at center, #000 48%, rgba(0,0,0,.9) 64%, transparent 82%);
@@ -86,8 +85,8 @@
 }
 
 @keyframes orvixRobotFloat {
-  0%, 100% { transform: translateY(0) !important; }
-  50% { transform: translateY(-6px) !important; }
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-6px); }
 }
 
 @media (prefers-reduced-motion: reduce) {
