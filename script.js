@@ -17,7 +17,7 @@ function initHeroSphere() {
   const mobileQuery = window.matchMedia('(max-width: 768px)');
 
   const camera = new THREE.PerspectiveCamera(28, 1, 0.1, 50);
-  camera.position.z = mobileQuery.matches ? 5.8 : 3.8;
+  camera.position.z = mobileQuery.matches ? 6.6 : 3.8;
 
   const renderer = new THREE.WebGLRenderer({
     canvas,
@@ -36,7 +36,7 @@ function initHeroSphere() {
 
     renderer.setSize(width, height, false);
     camera.aspect = width / height;
-    camera.position.z = mobileQuery.matches ? 5.8 : 3.8;
+    camera.position.z = mobileQuery.matches ? 6.6 : 3.8;
     camera.updateProjectionMatrix();
   }
 
