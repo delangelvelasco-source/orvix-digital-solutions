@@ -1,4 +1,22 @@
-/* ORVIX — correcciones visuales para móvil / Safari iOS */
+/* ORVIX — correcciones visuales responsivas y Safari iOS */
+/* Tamaño base para escritorio: el CSS móvil sobrescribe estas medidas. */
+.hero-robot {
+  position: absolute;
+  width: 130px;
+  max-width: 28%;
+  height: auto;
+  right: 0;
+  bottom: 0;
+  z-index: 10;
+  display: block;
+  object-fit: contain;
+  background: transparent;
+  border: 0;
+  box-shadow: none;
+  filter: drop-shadow(0 0 12px rgba(227,38,54,.35));
+  cursor: pointer;
+}
+
 @media (max-width: 768px) {
   .hero-visual {
     position: relative !important;
