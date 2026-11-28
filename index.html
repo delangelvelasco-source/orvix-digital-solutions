@@ -2,149 +2,14 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <title>ORVIX Digital Solutions | TU VISIÓN. NUESTRA TECNOLOGÍA.</title>
   <meta name="description" content="ORVIX Digital Solutions transforma ideas en experiencias digitales, inteligencia artificial y soluciones tecnológicas.">
   <meta name="theme-color" content="#090909">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="styles.css?v=orvix-chat-4">
-  <style>
-    .hero-visual {
-      height: 380px !important;
-      min-height: 380px !important;
-      display: flex !important;
-      align-items: center;
-      justify-content: center;
-      position: relative;
-    }
-    #hero-canvas {
-      width: 260px !important;
-      height: 260px !important;
-      display: block !important;
-    }
-    .hero-robot {
-      position: absolute;
-      right: -10px;
-      bottom: 0;
-      width: 130px;
-      height: auto;
-      z-index: 10;
-      cursor: pointer;
-      animation: robotPlay 3s ease-in-out infinite;
-      filter: drop-shadow(0 0 15px rgba(227,38,54,0.5));
-      transition: transform 0.2s;
-    }
-    .hero-robot:hover {
-      transform: scale(1.05);
-    }
-    @keyframes robotPlay {
-      0%, 100% { transform: translateY(0) rotate(-6deg); }
-      25% { transform: translateY(-8px) rotate(2deg); }
-      50% { transform: translateY(-4px) rotate(5deg); }
-      75% { transform: translateY(-10px) rotate(-2deg); }
-    }
-    /* ORVIX IA — launcher fijo visible en todas las secciones */
-    #orvixAIButton {
-      position: fixed !important;
-      right: max(18px, env(safe-area-inset-right)) !important;
-      bottom: max(18px, env(safe-area-inset-bottom)) !important;
-      z-index: 2147483000 !important;
-      display: inline-flex !important;
-      align-items: center;
-      justify-content: center;
-      gap: 9px;
-      min-height: 54px;
-      padding: 0 21px;
-      border: 1px solid rgba(255,255,255,.22);
-      border-radius: 999px;
-      background: linear-gradient(135deg,#ed263d,#a90020);
-      color: #fff;
-      font: 700 14px/1 Inter, sans-serif;
-      letter-spacing: .1px;
-      cursor: pointer;
-      box-shadow: 0 8px 30px rgba(227,38,54,.38);
-      -webkit-tap-highlight-color: transparent;
-    }
-    #orvixAIButton:hover { filter: brightness(1.12); transform: translateY(-2px); }
-    #orvixAIButton:focus-visible { outline: 3px solid #fff; outline-offset: 3px; }
-    .ai-chat {
-      display: none;
-      position: fixed;
-      bottom: 20px;
-      right: 20px;
-      width: 320px;
-      max-height: 420px;
-      background: #171719;
-      border: 1px solid rgba(227,38,54,0.3);
-      border-radius: 16px;
-      z-index: 2000;
-      overflow: hidden;
-      box-shadow: 0 10px 40px rgba(0,0,0,0.5);
-    }
-    .ai-chat.active { display: flex; flex-direction: column; }
-    .ai-chat-header {
-      background: #E32636;
-      color: white;
-      padding: 12px 16px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      font-weight: 600;
-    }
-    .ai-chat-header button {
-      background: none;
-      border: none;
-      color: white;
-      font-size: 1.2rem;
-      cursor: pointer;
-    }
-    .ai-chat-messages {
-      flex: 1;
-      padding: 12px;
-      overflow-y: auto;
-      max-height: 280px;
-    }
-    .ai-msg {
-      background: #090909;
-      padding: 10px 12px;
-      border-radius: 10px;
-      margin-bottom: 8px;
-      font-size: 0.9rem;
-      line-height: 1.4;
-    }
-    .ai-msg.user {
-      background: #E32636;
-      margin-left: 30px;
-    }
-    .ai-chat-input {
-      display: flex;
-      padding: 10px;
-      border-top: 1px solid rgba(255,255,255,0.1);
-    }
-    .ai-chat-input input {
-      flex: 1;
-      padding: 10px;
-      border: 1px solid rgba(255,255,255,0.1);
-      border-radius: 8px;
-      background: #090909;
-      color: white;
-      font-size: 0.9rem;
-    }
-    .ai-chat-input button {
-      margin-left: 8px;
-      padding: 10px 14px;
-      background: #E32636;
-      border: none;
-      border-radius: 8px;
-      color: white;
-      cursor: pointer;
-    }
-    @media (max-width: 768px) {
-      .hero-robot { width: 100px; right: 0; bottom: 0; }
-      .ai-chat { width: 90%; right: 5%; bottom: 10px; }
-    }
-  </style>
+  <link rel="stylesheet" href="styles.css?v=orvix-mobile-5">
+  <link rel="stylesheet" href="mobile-fixes.css?v=1">
 </head>
 <body>
   <nav class="navbar">
@@ -185,7 +50,7 @@
       <div class="hero-visual">
         <div class="hero-glow"></div>
         <canvas id="hero-canvas"></canvas>
-        <img src="robot.jpg.PNG" alt="OrvixIA Robot" class="hero-robot" onclick="openAIChat()">
+        <img src="robot.svg" alt="OrvixIA Robot" class="hero-robot" onclick="openAIChat()">
       </div>
     </div>
   </section>
@@ -323,14 +188,14 @@
 
   <!-- Botón flotante ORVIX IA: visible durante toda la navegación -->
   <button id="orvixAIButton" type="button" aria-label="Abrir chat de atención al cliente ORVIX IA" onclick="openAIChat()">
-    <span aria-hidden="true">✦</span> Hablar con ORVIX IA
+    <span aria-hidden="true">✦</span><span class="orvix-ai-label">Hablar con ORVIX IA</span>
   </button>
 
   <!-- AI Chat Panel -->
   <div class="ai-chat" id="aiChat">
     <div class="ai-chat-header">
       <div class="orvix-ai-identity">
-        <img src="robot.jpg.PNG" alt="" class="orvix-ai-chat-avatar">
+        <img src="robot.svg" alt="" class="orvix-ai-chat-avatar">
         <div><strong>ORVIX IA</strong><small><i></i> En línea</small></div>
       </div>
       <button type="button" onclick="closeAIChat()" aria-label="Cerrar chat">×</button>
@@ -344,8 +209,8 @@
     </div>
   </div>
 
-  <script src="https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.min.js"></script>
-  <script src="script.js?v=orvix-chat-4"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/0.149.0/three.min.js"></script>
+  <script src="script.js?v=orvix-mobile-5"></script>
 
 </body>
 </html>
