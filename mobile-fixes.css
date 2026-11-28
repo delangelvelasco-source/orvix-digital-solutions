@@ -112,3 +112,89 @@
 @media (prefers-reduced-motion: reduce) {
   .hero-robot { animation: none !important; }
 }
+
+
+/* ORVIX mobile Safari — ajuste fino para pantallas compactas */
+@media (max-width: 768px) {
+  .hero {
+    min-height: auto !important;
+    padding: 5.5rem 1rem 2.5rem !important;
+  }
+  .hero-content {
+    gap: 1rem !important;
+    grid-template-columns: minmax(0, 1fr) !important;
+  }
+  .hero-visual {
+    width: min(88vw, 320px) !important;
+    max-width: 320px !important;
+    height: min(88vw, 320px) !important;
+    min-height: 0 !important;
+    margin: 0 auto !important;
+    overflow: visible !important;
+    isolation: isolate;
+  }
+  #hero-canvas {
+    width: 100% !important;
+    height: 100% !important;
+    max-width: 100% !important;
+    max-height: 100% !important;
+  }
+  .hero-robot {
+    width: 66px !important;
+    max-width: 23% !important;
+    right: 0 !important;
+    bottom: 2px !important;
+    transform: none !important;
+    animation: none !important;
+    filter: drop-shadow(0 5px 9px rgba(0,0,0,.45)) drop-shadow(0 0 5px rgba(227,38,54,.25)) !important;
+    -webkit-transform: translateZ(0);
+    backface-visibility: hidden;
+  }
+  body > #orvixAIButton {
+    right: calc(12px + env(safe-area-inset-right, 0px)) !important;
+    bottom: calc(12px + env(safe-area-inset-bottom, 0px)) !important;
+    width: 46px !important;
+    min-width: 46px !important;
+    max-width: 46px !important;
+    height: 46px !important;
+    min-height: 46px !important;
+    padding: 0 !important;
+    border-radius: 50% !important;
+    gap: 0 !important;
+  }
+  body > #orvixAIButton > span[aria-hidden="true"] {
+    width: 40px !important;
+    height: 40px !important;
+    flex: 0 0 40px !important;
+    border-radius: 50% !important;
+  }
+  body > #orvixAIButton > .orvix-ai-label { display: none !important; }
+  #soluciones {
+    padding-top: 3.25rem !important;
+    padding-bottom: 7rem !important;
+    scroll-margin-top: 76px;
+  }
+  #soluciones .section-header { padding-inline: 4px; }
+  #soluciones .section-header h2 {
+    max-width: 100%;
+    overflow-wrap: normal;
+    text-wrap: balance;
+  }
+  #aiChat {
+    inset: auto 0 0 !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    height: min(92dvh, 760px) !important;
+    max-height: 92dvh !important;
+    border-radius: 18px 18px 0 0 !important;
+  }
+}
+@media (max-width: 390px) {
+  .hero-visual { width: 84vw !important; height: 84vw !important; }
+  .hero-text h1 { font-size: clamp(2.35rem, 11vw, 2.8rem) !important; }
+}
+@supports not (height: 100dvh) {
+  @media (max-width: 768px) {
+    #aiChat { height: 92vh !important; max-height: 92vh !important; }
+  }
+}
