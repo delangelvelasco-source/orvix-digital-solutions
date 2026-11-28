@@ -13,41 +13,55 @@ function initHeroSphere() {
   const canvas = document.getElementById('hero-canvas');
   if (!canvas || typeof THREE === 'undefined') return;
 
-  const size = 300;
-  canvas.style.width = size + 'px';
-  canvas.style.height = size + 'px';
-  canvas.style.display = 'block';
-  canvas.style.margin = '0 auto';
-
   const scene = new THREE.Scene();
-  const camera = new THREE.PerspectiveCamera(28, 1, 0.1, 50);
-  camera.position.z = 3.8;
+  const mobileQuery = window.matchMedia('(max-width: 768px)');
 
-  const renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true });
-  renderer.setSize(size, size);
+  const camera = new THREE.PerspectiveCamera(28, 1, 0.1, 50);
+  camera.position.z = mobileQuery.matches ? 5.8 : 3.8;
+
+  const renderer = new THREE.WebGLRenderer({
+    canvas,
+    alpha: true,
+    antialias: true
+  });
   renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.5));
   renderer.setClearColor(0x000000, 0);
 
-  // Core sphere
-  const coreGeo = new THREE.SphereGeometry(0.55, 32, 32);
-  const coreMat = new THREE.MeshStandardMaterial({
-    color: 0x1a1a1e,
-    metalness: 0.9,
-    roughness: 0.15,
-    emissive: 0x330000,
-    emissiveIntensity: 0.3
-  });
-  const core = new THREE.Mesh(coreGeo, coreMat);
+  function resizeSphere() {
+    const parent = canvas.parentElement;
+    if (!parent) return;
+
+    const width = Math.max(1, parent.clientWidth);
+    const height = Math.max(1, parent.clientHeight);
+
+    renderer.setSize(width, height, false);
+    camera.aspect = width / height;
+    camera.position.z = mobileQuery.matches ? 5.8 : 3.8;
+    camera.updateProjectionMatrix();
+  }
+
+  const core = new THREE.Mesh(
+    new THREE.SphereGeometry(0.55, 32, 32),
+    new THREE.MeshStandardMaterial({
+      color: 0x1a1a1e,
+      metalness: 0.9,
+      roughness: 0.15,
+      emissive: 0x330000,
+      emissiveIntensity: 0.3
+    })
+  );
   scene.add(core);
 
-  // Inner energy
   const energy = new THREE.Mesh(
     new THREE.SphereGeometry(0.25, 24, 24),
-    new THREE.MeshBasicMaterial({ color: 0xff2244, transparent: true, opacity: 0.8 })
+    new THREE.MeshBasicMaterial({
+      color: 0xff2244,
+      transparent: true,
+      opacity: 0.8
+    })
   );
   scene.add(energy);
 
-  // Tech rings
   const ringMat = new THREE.MeshBasicMaterial({
     color: 0xE32636,
     transparent: true,
@@ -55,23 +69,31 @@ function initHeroSphere() {
     side: THREE.DoubleSide
   });
 
-  const ring1 = new THREE.Mesh(new THREE.TorusGeometry(0.95, 0.008, 8, 64), ringMat);
+  const ring1 = new THREE.Mesh(
+    new THREE.TorusGeometry(0.95, 0.008, 8, 64),
+    ringMat
+  );
   ring1.rotation.x = Math.PI / 2.2;
   scene.add(ring1);
 
-  const ring2 = new THREE.Mesh(new THREE.TorusGeometry(1.15, 0.006, 8, 64), ringMat.clone());
+  const ring2 = new THREE.Mesh(
+    new THREE.TorusGeometry(1.15, 0.006, 8, 64),
+    ringMat.clone()
+  );
   ring2.material.opacity = 0.25;
   ring2.rotation.x = Math.PI / 3;
   ring2.rotation.y = 0.5;
   scene.add(ring2);
 
-  const ring3 = new THREE.Mesh(new THREE.TorusGeometry(1.35, 0.004, 8, 48), ringMat.clone());
+  const ring3 = new THREE.Mesh(
+    new THREE.TorusGeometry(1.35, 0.004, 8, 48),
+    ringMat.clone()
+  );
   ring3.material.opacity = 0.15;
   ring3.rotation.x = Math.PI / 4;
   ring3.rotation.z = 0.3;
   scene.add(ring3);
 
-  // Grid sphere
   const grid = new THREE.Mesh(
     new THREE.SphereGeometry(0.85, 16, 16),
     new THREE.MeshBasicMaterial({
@@ -83,14 +105,24 @@ function initHeroSphere() {
   );
   scene.add(grid);
 
-  // Lights
   scene.add(new THREE.AmbientLight(0xffffff, 0.4));
+
   const key = new THREE.DirectionalLight(0xffffff, 0.9);
   key.position.set(-3, 4, 5);
   scene.add(key);
+
   const red = new THREE.PointLight(0xE32636, 4, 8);
   red.position.set(1.5, 0.5, 2);
   scene.add(red);
+
+  resizeSphere();
+  window.addEventListener('resize', resizeSphere, { passive: true });
+  mobileQuery.addEventListener('change', resizeSphere);
+
+  if (typeof ResizeObserver !== 'undefined') {
+    const observer = new ResizeObserver(resizeSphere);
+    observer.observe(canvas.parentElement);
+  }
 
   let t = 0;
   function animate() {
