@@ -1,0 +1,95 @@
+/* ORVIX — correcciones visuales para móvil / Safari iOS */
+@media (max-width: 768px) {
+  .hero-visual {
+    position: relative !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    width: 100% !important;
+    max-width: 340px !important;
+    height: min(88vw, 340px) !important;
+    min-height: 280px !important;
+    margin-inline: auto !important;
+    overflow: visible !important;
+  }
+
+  #hero-canvas {
+    display: block !important;
+    width: 100% !important;
+    height: 100% !important;
+    max-width: none !important;
+    max-height: none !important;
+    margin: 0 auto !important;
+  }
+
+  .hero-robot {
+    position: absolute !important;
+    width: 80px !important;
+    height: auto !important;
+    right: 4px !important;
+    bottom: 8px !important;
+    z-index: 10 !important;
+    background: transparent !important;
+    border: 0 !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    transform: none !important;
+    rotate: none !important;
+    mix-blend-mode: screen;
+    -webkit-mask-image: radial-gradient(ellipse at center, #000 48%, rgba(0,0,0,.9) 64%, transparent 82%);
+    mask-image: radial-gradient(ellipse at center, #000 48%, rgba(0,0,0,.9) 64%, transparent 82%);
+    filter: drop-shadow(0 0 7px rgba(227,38,54,.38));
+    animation: orvixRobotFloat 4s ease-in-out infinite !important;
+  }
+
+  body > #orvixAIButton {
+    position: fixed !important;
+    right: calc(16px + env(safe-area-inset-right, 0px)) !important;
+    bottom: calc(16px + env(safe-area-inset-bottom, 0px)) !important;
+    width: 48px !important;
+    min-width: 48px !important;
+    max-width: 48px !important;
+    height: 48px !important;
+    min-height: 48px !important;
+    padding: 3px !important;
+    gap: 0 !important;
+    border-radius: 50% !important;
+    font-size: 0 !important;
+    line-height: 0 !important;
+    justify-content: center !important;
+    align-items: center !important;
+    background: linear-gradient(145deg, #f02d45, #c40027 58%, #8e001c) !important;
+    box-shadow: 0 4px 18px rgba(201,0,36,.35) !important;
+    z-index: 2147483000 !important;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  body > #orvixAIButton > span {
+    display: inline-flex !important;
+    width: 40px !important;
+    height: 40px !important;
+    flex: 0 0 40px !important;
+    align-items: center !important;
+    justify-content: center !important;
+    border-radius: 50% !important;
+    font-size: 22px !important;
+    line-height: 1 !important;
+  }
+
+  body > #aiChat {
+    left: 3vw !important;
+    right: 3vw !important;
+    bottom: 0 !important;
+    width: 94vw !important;
+    max-width: none !important;
+  }
+}
+
+@keyframes orvixRobotFloat {
+  0%, 100% { transform: translateY(0) !important; }
+  50% { transform: translateY(-6px) !important; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero-robot { animation: none !important; }
+}
