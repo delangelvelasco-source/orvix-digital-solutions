@@ -165,10 +165,41 @@ function handleSubmit(e) {
   f.reset();
 }
 
+function bootHeroSphere() {
+  if (window.THREE) {
+    initHeroSphere();
+    return;
+  }
+
+  // CDN alternativo por si el primer proveedor no responde en Safari/iOS.
+  const fallbackSources = [
+    'https://cdn.jsdelivr.net/npm/three@0.149.0/build/three.min.js'
+  ];
+
+  function loadFallback(index) {
+    if (window.THREE) {
+      initHeroSphere();
+      return;
+    }
+    if (index >= fallbackSources.length) {
+      console.warn('ORVIX: Three.js no pudo cargarse; se omite la esfera 3D.');
+      return;
+    }
+
+    const loader = document.createElement('script');
+    loader.src = fallbackSources[index];
+    loader.onload = () => initHeroSphere();
+    loader.onerror = () => loadFallback(index + 1);
+    document.head.appendChild(loader);
+  }
+
+  loadFallback(0);
+}
+
 if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', initHeroSphere);
+  document.addEventListener('DOMContentLoaded', bootHeroSphere, { once: true });
 } else {
-  initHeroSphere();
+  bootHeroSphere();
 }
 
 /* ORVIX IA — conexión real al Worker */
